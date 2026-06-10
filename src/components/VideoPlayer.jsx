@@ -20,6 +20,8 @@ const VideoPlayer = ({ channelName, videoUrl }) => {
   const [quality, setQuality] = useState('Auto');
   const [isQualityOpen, setIsQualityOpen] = useState(false);
   const [qualityOptions, setQualityOptions] = useState([{ index: -1, label: 'Auto' }]);
+  const [isWaiting, setIsWaiting] = useState(true);
+  const [isFullScreen, setIsFullScreen] = useState(false);
   const containerRef = useRef(null);
   const videoRef = useRef(null);
   const controlsTimeoutRef = useRef(null);
@@ -29,6 +31,22 @@ const VideoPlayer = ({ channelName, videoUrl }) => {
   useEffect(() => {
     isPlayingRef.current = isPlaying;
   }, [isPlaying]);
+
+  useEffect(() => {
+    const handleFullScreenChange = () => {
+      setIsFullScreen(
+        !!(document.fullscreenElement || document.webkitFullscreenElement)
+      );
+    };
+
+    document.addEventListener('fullscreenchange', handleFullScreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullScreenChange);
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullScreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullScreenChange);
+    };
+  }, []);
 
   const handleUserActivity = () => {
     setShowControls(true);
@@ -55,6 +73,7 @@ const VideoPlayer = ({ channelName, videoUrl }) => {
     if (isPlaying) {
       video.play().catch(err => {
         console.warn('Autoplay/play failed:', err);
+        setIsPlaying(false);
       });
     } else {
       video.pause();
@@ -69,6 +88,41 @@ const VideoPlayer = ({ channelName, videoUrl }) => {
     video.volume = volume / 100;
   }, [isMuted, volume]);
 
+  // Track buffering/loading state
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleWaiting = () => setIsWaiting(true);
+    const handlePlaying = () => setIsWaiting(false);
+    const handleSeeked = () => setIsWaiting(false);
+    const handleSeeking = () => setIsWaiting(true);
+    const handleLoadStart = () => setIsWaiting(true);
+    const handleLoadedData = () => setIsWaiting(false);
+    const handleCanPlay = () => setIsWaiting(false);
+    const handlePause = () => setIsWaiting(false);
+
+    video.addEventListener('waiting', handleWaiting);
+    video.addEventListener('playing', handlePlaying);
+    video.addEventListener('seeked', handleSeeked);
+    video.addEventListener('seeking', handleSeeking);
+    video.addEventListener('loadstart', handleLoadStart);
+    video.addEventListener('loadeddata', handleLoadedData);
+    video.addEventListener('canplay', handleCanPlay);
+    video.addEventListener('pause', handlePause);
+
+    return () => {
+      video.removeEventListener('waiting', handleWaiting);
+      video.removeEventListener('playing', handlePlaying);
+      video.removeEventListener('seeked', handleSeeked);
+      video.removeEventListener('seeking', handleSeeking);
+      video.removeEventListener('loadstart', handleLoadStart);
+      video.removeEventListener('loadeddata', handleLoadedData);
+      video.removeEventListener('canplay', handleCanPlay);
+      video.removeEventListener('pause', handlePause);
+    };
+  }, [videoUrl]);
+
   // Load and play HLS (.m3u8) streams
   useEffect(() => {
     const video = videoRef.current;
@@ -77,11 +131,15 @@ const VideoPlayer = ({ channelName, videoUrl }) => {
     let hls;
     const isHls = videoUrl && (videoUrl.endsWith('.m3u8') || videoUrl.includes('.m3u8') || videoUrl.includes('m3u8'));
 
+    setIsWaiting(true);
+
     if (isHls) {
       if (video.canPlayType('application/vnd.apple.mpegurl')) {
         video.src = videoUrl;
         if (isPlayingRef.current) {
-          video.play().catch(() => {});
+          video.play().catch(() => {
+            setIsPlaying(false);
+          });
         }
         setTimeout(() => {
           setQualityOptions([{ index: -1, label: 'Auto' }]);
@@ -107,7 +165,9 @@ const VideoPlayer = ({ channelName, videoUrl }) => {
 
           hls.on(Hls.Events.MANIFEST_PARSED, () => {
             if (isPlayingRef.current) {
-              video.play().catch(() => {});
+              video.play().catch(() => {
+                setIsPlaying(false);
+              });
             }
 
             if (hls.levels && hls.levels.length > 0) {
@@ -143,7 +203,9 @@ const VideoPlayer = ({ channelName, videoUrl }) => {
     } else {
       video.src = videoUrl;
       if (isPlayingRef.current) {
-        video.play().catch(() => {});
+        video.play().catch(() => {
+          setIsPlaying(false);
+        });
       }
       setTimeout(() => {
         setQualityOptions([{ index: -1, label: 'Auto' }]);
@@ -168,8 +230,9 @@ const VideoPlayer = ({ channelName, videoUrl }) => {
   };
 
   const togglePlay = e => {
-    e.stopPropagation();
+    if (e) e.stopPropagation();
     setIsPlaying(!isPlaying);
+    handleUserActivity();
   };
 
   const toggleMute = e => {
@@ -178,149 +241,195 @@ const VideoPlayer = ({ channelName, videoUrl }) => {
   };
 
   const toggleFullScreen = e => {
-    e.stopPropagation();
-    if (!containerRef.current) return;
+    if (e) e.stopPropagation();
+    if (!containerRef.current || !videoRef.current) return;
 
-    if (!document.fullscreenElement) {
-      containerRef.current.requestFullscreen().catch(err => {
-        console.error(
-          `Error attempting to enable full-screen mode: ${err.message}`,
-        );
-      });
+    const container = containerRef.current;
+    const video = videoRef.current;
+
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      if (container.requestFullscreen) {
+        container.requestFullscreen().catch(err => {
+          console.error('Fullscreen error:', err);
+        });
+      } else if (container.webkitRequestFullscreen) {
+        container.webkitRequestFullscreen();
+      } else if (video.webkitEnterFullscreen) {
+        video.webkitEnterFullscreen();
+      }
     } else {
-      document.exitFullscreen();
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      }
     }
   };
 
   return (
-    <div
-      ref={containerRef}
-      className="group relative aspect-video w-full overflow-hidden bg-black shadow-2xl ring-1 ring-white/10 lg:rounded-2xl"
+    <div 
+      className="flex flex-col w-full scrollbar-none"
       onMouseMove={handleUserActivity}
-      onClick={handleUserActivity}
     >
-      <div className="absolute inset-0 flex items-center justify-center">
-        <video
-          ref={videoRef}
-          alt="Live Stream"
-          className={`h-full w-full object-cover transition-opacity duration-700 ${isPlaying ? 'opacity-100' : 'opacity-40 grayscale'}`}
-          playsInline
-        />
-        {!isPlaying && (
-          <motion.button
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            onClick={togglePlay}
-            className="z-10 flex h-20 w-20 items-center justify-center rounded-full bg-white/20 backdrop-blur-xl text-white hover:bg-white/30 transition-all"
-          >
-            <Play size={40} fill="currentColor" />
-          </motion.button>
-        )}
-      </div>
-
-      <div className="absolute left-6 top-6 z-20 flex items-center gap-2">
-        <div className="flex items-center gap-1.5 rounded-md bg-red-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg">
+      {/* Live Badge and Channel Name on top (outside the main video player) */}
+      <div className="flex items-center gap-2.5 mb-3.5 px-4 lg:px-0">
+        <div className="flex items-center gap-1.5 rounded-md bg-[#E61944] px-1.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-md">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
           Live
         </div>
-        <div className="rounded-md bg-black/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-md">
+        <h2 className="text-sm sm:text-sm font-bold text-white tracking-wide">
           {channelName}
-        </div>
+        </h2>
       </div>
 
-      <AnimatePresence>
-        {showControls && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-0 z-10 bg-gradient-to-t from-black/85 via-black/10 to-transparent pointer-events-none"
-            />
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              className="absolute bottom-2 left-4 right-4 z-20 flex items-center justify-between gap-4 p-2 md:p-3"
-              onClick={e => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center gap-3 md:gap-6">
-                  <button
-                    onClick={togglePlay}
-                    className="text-white hover:text-[#E61944] hover:scale-105 transition-all cursor-pointer"
-                  >
-                    {isPlaying ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" />}
-                  </button>
+      <div
+        ref={containerRef}
+        className={`group relative bg-black shadow-2xl scrollbar-none transition-all duration-300 ${
+          isFullScreen 
+            ? 'w-screen h-screen rounded-none ring-0' 
+            : 'aspect-video w-full ring-1 ring-white/10 lg:rounded-2xl'
+        }`}
+        onMouseMove={handleUserActivity}
+        onClick={handleUserActivity}
+      >
+        <div className="absolute inset-0 flex items-center justify-center">
+          <video
+            ref={videoRef}
+            alt="Live Stream"
+            className="h-full w-full object-contain transition-opacity duration-700 opacity-100"
+            playsInline
+          />
+        </div>
 
-                  <div className="flex items-center gap-2 group/volume">
+        {/* Buffering/Loading Spinner Overlay */}
+        {isWaiting && isPlaying && (
+          <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] pointer-events-none">
+            <span className="h-12 w-12 animate-spin rounded-full border-4 border-[#E61944] border-t-transparent" />
+            <span className="mt-3 text-xs font-semibold text-white/80 tracking-wider">Buffering...</span>
+          </div>
+        )}
+
+        {/* Center Play/Pause Button Overlay */}
+        <div
+          className="absolute inset-0 z-10 flex items-center justify-center cursor-pointer"
+          onClick={togglePlay}
+        >
+          <AnimatePresence>
+            {!isWaiting && (!isPlaying || showControls) && (
+              <motion.button
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  togglePlay(e);
+                }}
+                className="z-20 flex h-20 w-20 items-center justify-center rounded-full bg-black/5 backdrop-blur-[1px] border border-white/10 text-white hover:bg-black/20 hover:scale-105 transition-all shadow-2xl"
+              >
+                {isPlaying ? (
+                  <Pause size={36} fill="currentColor" />
+                ) : (
+                  <Play size={36} fill="currentColor" className="ml-1" />
+                )}
+              </motion.button>
+            )}
+          </AnimatePresence>
+        </div>
+
+        <AnimatePresence>
+          {showControls && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 z-10 bg-gradient-to-t from-black/60 via-black/5 to-transparent pointer-events-none"
+              />
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className="absolute bottom-2 left-4 right-4 z-20 flex items-center justify-between gap-4 p-2 md:p-3"
+                onClick={e => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between w-full">
+                  <div className="flex items-center gap-3 md:gap-6">
                     <button
-                      onClick={toggleMute}
+                      onClick={togglePlay}
                       className="text-white hover:text-[#E61944] hover:scale-105 transition-all cursor-pointer"
                     >
-                      {isMuted || volume === 0 ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                      {isPlaying ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" />}
                     </button>
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={isMuted ? 0 : volume}
-                      onChange={e => setVolume(parseInt(e.target.value))}
-                      className="hidden md:block w-20 h-1 bg-white/30 rounded-lg appearance-none cursor-pointer accent-white"
-                    />
+
+                    <div className="flex items-center gap-2 group/volume">
+                      <button
+                        onClick={toggleMute}
+                        className="text-white hover:text-[#E61944] hover:scale-105 transition-all cursor-pointer"
+                      >
+                        {isMuted || volume === 0 ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                      </button>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={isMuted ? 0 : volume}
+                        onChange={e => setVolume(parseInt(e.target.value))}
+                        className="hidden md:block w-20 h-1 bg-white/30 rounded-lg appearance-none cursor-pointer accent-white"
+                      />
+                    </div>
+
+                    <div className="hidden sm:flex items-center gap-3 text-xs font-semibold text-white/80">
+                      <span className="flex items-center gap-1.5">
+                        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#E61944]" />
+                        Live Stream
+                      </span>
+                    </div>
                   </div>
 
-                  <div className="hidden sm:flex items-center gap-3 text-xs font-semibold text-white/80">
-                    <span className="flex items-center gap-1.5">
-                      <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#E61944]" />
-                      Live Stream
-                    </span>
-                  </div>
-                </div>
+                  <div className="flex items-center gap-3">
+                    <div className="relative">
+                      <button
+                        onClick={e => {
+                          e.stopPropagation();
+                          setIsQualityOpen(!isQualityOpen);
+                        }}
+                        className="flex items-center gap-1.5 text-xs font-bold text-white hover:text-[#E61944] transition-colors cursor-pointer bg-white/10 hover:bg-white/20 px-2.5 py-1.5 rounded-lg border border-white/5"
+                      >
+                        <Settings size={15} />
+                        <span>{quality}</span>
+                      </button>
 
-                <div className="flex items-center gap-3">
-                  <div className="relative">
+                      {isQualityOpen && qualityOptions.length > 0 && (
+                        <div className="absolute bottom-full right-0 mb-3 w-32 rounded-xl bg-zinc-950/90 p-2 backdrop-blur-xl border border-white/10 shadow-2xl">
+                          {qualityOptions.map(opt => (
+                            <button
+                              key={opt.index}
+                              onClick={e => {
+                                e.stopPropagation();
+                                changeQuality(opt);
+                              }}
+                              className={`w-full rounded-lg px-3 py-1.5 text-left text-xs font-bold transition-colors cursor-pointer ${quality === opt.label ? 'bg-[#E61944] text-white' : 'text-white/60 hover:bg-white/10'}`}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
                     <button
-                      onClick={e => {
-                        e.stopPropagation();
-                        setIsQualityOpen(!isQualityOpen);
-                      }}
-                      className="flex items-center gap-1.5 text-xs font-bold text-white hover:text-[#E61944] transition-colors cursor-pointer bg-white/10 hover:bg-white/20 px-2.5 py-1.5 rounded-lg border border-white/5"
+                      onClick={toggleFullScreen}
+                      className="text-white hover:text-[#E61944] hover:scale-105 transition-all cursor-pointer bg-white/10 hover:bg-white/20 p-1.5 rounded-lg border border-white/5"
                     >
-                      <Settings size={15} />
-                      <span>{quality}</span>
+                      <Maximize size={18} />
                     </button>
-
-                    {isQualityOpen && qualityOptions.length > 0 && (
-                      <div className="absolute bottom-full right-0 mb-3 w-32 rounded-xl bg-zinc-950/90 p-2 backdrop-blur-xl border border-white/10 shadow-2xl">
-                        {qualityOptions.map(opt => (
-                          <button
-                            key={opt.index}
-                            onClick={e => {
-                              e.stopPropagation();
-                              changeQuality(opt);
-                            }}
-                            className={`w-full rounded-lg px-3 py-1.5 text-left text-xs font-bold transition-colors cursor-pointer ${quality === opt.label ? 'bg-[#E61944] text-white' : 'text-white/60 hover:bg-white/10'}`}
-                          >
-                            {opt.label}
-                          </button>
-                        ))}
-                      </div>
-                    )}
                   </div>
-
-                  <button
-                    onClick={toggleFullScreen}
-                    className="text-white hover:text-[#E61944] hover:scale-105 transition-all cursor-pointer bg-white/10 hover:bg-white/20 p-1.5 rounded-lg border border-white/5"
-                  >
-                    <Maximize size={18} />
-                  </button>
                 </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };

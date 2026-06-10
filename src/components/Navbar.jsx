@@ -6,9 +6,9 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const navLinks = [
-  { href: "/live", label: "Live Now" },
-  { href: "/schedule", label: "Schedule" },
-  { href: "/highlights", label: "Highlights" },
+  { href: '/live', label: 'Live Now' },
+  { href: '/schedule', label: 'Schedule' },
+  { href: '/highlights', label: 'Highlights' },
 ];
 
 const Navbar = () => {
@@ -18,9 +18,17 @@ const Navbar = () => {
     <header className="sticky top-0 z-50 border-b border-zinc-800/60 bg-zinc-950/70 backdrop-blur-xl px-6 py-4 text-white">
       <div className="max-w-7xl w-full mx-auto">
         <div className="flex items-center justify-between">
-          <Link href={'/'} className="flex items-center gap-2.5 group" onClick={() => setIsOpen(false)}>
+          <Link
+            href={'/'}
+            className="flex items-center gap-2.5 group"
+            onClick={() => setIsOpen(false)}
+          >
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#E61944] text-white shadow-lg shadow-[#E61944]/20 group-hover:scale-105 transition-all duration-300">
-              <Trophy size={20} strokeWidth={2.5} className="group-hover:rotate-6 transition-transform" />
+              <Trophy
+                size={20}
+                strokeWidth={2.5}
+                className="group-hover:rotate-6 transition-transform"
+              />
             </div>
             <span className="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
               Ajker Khela
@@ -30,7 +38,7 @@ const Navbar = () => {
             </span>
           </Link>
 
-          <button 
+          <button
             onClick={() => setIsOpen(!isOpen)}
             className="flex h-10 w-10 items-center justify-center rounded-xl bg-zinc-900/60 border border-zinc-800 hover:bg-zinc-800 hover:border-zinc-700 transition-all lg:hidden text-white"
           >

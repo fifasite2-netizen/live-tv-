@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -43,7 +43,7 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="overflow-hidden lg:rounded-2xl"
+            className="w-full scrollbar-none"
           >
             {activeChannel ? (
               <VideoPlayer
@@ -68,7 +68,11 @@ export default function Home() {
           <div className="px-6 lg:px-0">
             <StreamHeader
               title={activeChannel ? activeChannel.name : 'Live Stream'}
-              location={activeChannel ? `Category: ${activeChannel.group}` : 'Loading...'}
+              location={
+                activeChannel
+                  ? `Category: ${activeChannel.group}`
+                  : 'Loading...'
+              }
             />
           </div>
 
@@ -77,7 +81,7 @@ export default function Home() {
               {[
                 { id: 'channels', label: 'Channels' },
                 { id: 'schedule', label: 'Schedule' },
-                { id: 'stats', label: 'Stats & Clips' }
+                { id: 'stats', label: 'Stats & Clips' },
               ].map(tab => {
                 const isActive = activeTab === tab.id;
                 return (
@@ -85,7 +89,7 @@ export default function Home() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex-1 text-center py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                      isActive 
+                      isActive
                         ? 'bg-[#E61944] text-white shadow-md shadow-[#E61944]/15'
                         : 'text-zinc-400 hover:text-white'
                     }`}
@@ -100,7 +104,9 @@ export default function Home() {
           {/* Main Area Content Panel */}
           <div className="px-6 lg:px-0">
             {/* Match Stats & Highlights (Always visible on desktop, tabbed on mobile) */}
-            <div className={`space-y-6 lg:space-y-8 ${activeTab === 'stats' ? 'block' : 'hidden lg:block'}`}>
+            <div
+              className={`space-y-6 lg:space-y-8 ${activeTab === 'stats' ? 'block' : 'hidden lg:block'}`}
+            >
               <MatchStats />
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -113,8 +119,8 @@ export default function Home() {
 
             {/* Mobile Viewports (Only visible on mobile) */}
             <div className="lg:hidden mt-2">
-              {activeTab === 'channels' && (
-                isLoading ? (
+              {activeTab === 'channels' &&
+                (isLoading ? (
                   <div className="rounded-2xl bg-zinc-900 border border-zinc-800 p-8 flex flex-col items-center justify-center gap-3 text-zinc-500 min-h-[200px]">
                     <span className="h-6 w-6 animate-spin rounded-full border-3 border-red-600 border-t-transparent" />
                     <span className="text-sm">Fetching playlist...</span>
@@ -125,12 +131,9 @@ export default function Home() {
                     activeChannelId={activeChannel ? activeChannel.id : ''}
                     onChannelSelect={setActiveChannel}
                   />
-                )
-              )}
+                ))}
 
-              {activeTab === 'schedule' && (
-                <MatchSchedule />
-              )}
+              {activeTab === 'schedule' && <MatchSchedule />}
             </div>
           </div>
         </div>
