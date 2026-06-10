@@ -37,7 +37,7 @@ const SCHEDULE = [
 
 const MatchSchedule = () => {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 md:hidden lg:block ">
       <div className="flex items-center justify-between px-2">
         <h2 className="text-lg font-bold tracking-tight flex items-center gap-2">
           <Calendar size={20} className="text-[#E61944]" />

@@ -59,7 +59,7 @@ export default function Home() {
 
           <MatchSchedule />
 
-          <PremiumPromo className="hidden" />
+          <PremiumPromo />
         </motion.div>
       </div>
     </div>
