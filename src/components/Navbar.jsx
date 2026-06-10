@@ -69,6 +69,8 @@ const Navbar = () => {
                 </Link>
               );
             })}
+
+            {/* Button will be here */}
             
           </nav>
         </div>
@@ -103,9 +105,8 @@ const Navbar = () => {
                   </Link>
                 );
               })}
-              <button className="w-full rounded-xl bg-[#E61944] py-3 text-sm font-bold text-white hover:bg-red-700 transition-all mt-2 shadow-lg shadow-[#E61944]/15 cursor-pointer">
-                Sign In
-              </button>
+
+              {/* Button will be here */}
             </motion.div>
           )}
         </AnimatePresence>
