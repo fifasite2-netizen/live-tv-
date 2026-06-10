@@ -15,11 +15,11 @@ const StreamHeader = ({
         </p>
       </div>
       <div className="flex items-center gap-2">
-        <button className="flex items-center gap-2 rounded-full bg-zinc-100 dark:bg-zinc-800 px-4 py-2 text-sm font-semibold hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">
+        <button className="flex items-center gap-2 rounded-full bg-zinc-900/60 border border-zinc-800/80 px-4 py-2 text-sm font-semibold text-zinc-300 hover:bg-zinc-800 hover:text-white transition-all cursor-pointer">
           <Share2 size={16} />
           Share
         </button>
-        <button className="flex items-center gap-2 rounded-full bg-[#E61944] px-6 py-2 text-sm font-semibold text-white hover:scale-105 transition-transform">
+        <button className="flex items-center gap-2 rounded-full bg-[#E61944] px-6 py-2 text-sm font-semibold text-white hover:scale-105 transition-transform cursor-pointer">
           Follow Channel
         </button>
       </div>

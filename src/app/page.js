@@ -72,8 +72,7 @@ export default function Home() {
             />
           </div>
 
-          {/* Mobile Navigation Tabs (Hidden on Desktop) */}
-          <div className="lg:hidden sticky top-[72px] z-30 bg-zinc-950/80 backdrop-blur-md px-6 py-3 border-b border-zinc-800/60 -mx-6 mb-2">
+          <div className="lg:hidden sticky top-[72px] z-30 bg-zinc-950/80 backdrop-blur-md px-6 py-3 border-b border-zinc-800/60 mb-2">
             <div className="flex bg-zinc-900/60 p-1 rounded-xl border border-zinc-800/80">
               {[
                 { id: 'channels', label: 'Channels' },

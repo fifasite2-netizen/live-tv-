@@ -59,14 +59,14 @@ const MatchSchedule = () => {
   }, [selectedDate]);
 
   return (
-    <div className="space-y-4 rounded-2xl border border-zinc-200 dark:border-zinc-800/85 bg-white dark:bg-zinc-900/50 backdrop-blur-xl p-5 shadow-sm">
+    <div className="space-y-4 rounded-2xl border border-zinc-800/60 bg-zinc-900/40 backdrop-blur-xl p-5 shadow-sm">
       {/* Header */}
       <div className="flex items-center justify-between px-1">
-        <h2 className="text-lg font-extrabold tracking-tight flex items-center gap-2 text-zinc-900 dark:text-white">
+        <h2 className="text-lg font-extrabold tracking-tight flex items-center gap-2 text-white">
           <Trophy size={20} className="text-[#E61944] animate-bounce" />
           World Cup 2026
         </h2>
-        <span className="text-[10px] font-bold uppercase tracking-wider bg-red-600/10 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full">
+        <span className="text-[10px] font-bold uppercase tracking-wider bg-red-600/10 text-red-500 px-2 py-0.5 rounded-full">
           Live Schedule
         </span>
       </div>
@@ -75,7 +75,7 @@ const MatchSchedule = () => {
       {loading ? (
         <div className="h-12 flex items-center gap-2 overflow-x-hidden">
           {[1, 2, 3, 4, 5].map(i => (
-            <div key={i} className="h-10 w-16 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800 flex-shrink-0" />
+            <div key={i} className="h-10 w-16 animate-pulse rounded-xl bg-zinc-800 flex-shrink-0" />
           ))}
         </div>
       ) : uniqueDates.length > 0 ? (
@@ -94,10 +94,10 @@ const MatchSchedule = () => {
                 key={dateStr}
                 data-active={isActive}
                 onClick={() => setSelectedDate(dateStr)}
-                className={`flex flex-col items-center justify-center min-w-[75px] py-1.5 px-3 rounded-xl border text-center transition-all ${
+                className={`flex flex-col items-center justify-center min-w-[75px] py-1.5 px-3 rounded-xl border text-center transition-all cursor-pointer ${
                   isActive 
                     ? 'bg-[#E61944] border-[#E61944] text-white shadow-md shadow-[#E61944]/25 scale-105' 
-                    : 'bg-zinc-50 dark:bg-zinc-900/30 border-zinc-150 dark:border-zinc-800/80 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                    : 'bg-zinc-900/30 border-zinc-800/80 text-zinc-400 hover:bg-zinc-800'
                 }`}
               >
                 <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">{shortWeekday}</span>
@@ -116,7 +116,7 @@ const MatchSchedule = () => {
             <span className="text-xs font-semibold">Loading fixtures...</span>
           </div>
         ) : filteredMatches.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-zinc-400 dark:text-zinc-500 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl">
+          <div className="flex flex-col items-center justify-center py-12 text-zinc-500 border border-dashed border-zinc-800 rounded-xl">
             <Calendar size={28} className="opacity-40 mb-2" />
             <span className="text-xs font-medium">No matches scheduled for this date</span>
           </div>
@@ -130,20 +130,20 @@ const MatchSchedule = () => {
                 key={match.id}
                 className={`flex flex-col gap-3 rounded-xl border p-4 transition-all ${
                   isLive 
-                    ? 'border-red-500/30 bg-red-500/5 dark:bg-red-950/10 shadow-sm'
-                    : 'border-zinc-200 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/20 hover:border-zinc-300 dark:hover:border-zinc-700'
+                    ? 'border-red-500/30 bg-red-950/10 shadow-sm'
+                    : 'border-zinc-800/60 bg-zinc-900/20 hover:border-zinc-700'
                 }`}
               >
                 {/* Meta details (group name + status indicator) */}
-                <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-zinc-500">
                   <span>{match.group}</span>
                   {isLive ? (
-                    <div className="flex items-center gap-1.5 text-red-600 dark:text-red-400">
-                      <span className="h-2 w-2 animate-ping rounded-full bg-red-600" />
+                    <div className="flex items-center gap-1.5 text-red-500">
+                      <span className="h-2 w-2 animate-ping rounded-full bg-red-500" />
                       <span>{match.statusText}</span>
                     </div>
                   ) : isCompleted ? (
-                    <span className="text-zinc-500 dark:text-zinc-400 bg-zinc-200/50 dark:bg-zinc-800 px-1.5 py-0.5 rounded">
+                    <span className="text-zinc-400 bg-zinc-800 px-1.5 py-0.5 rounded">
                       FT
                     </span>
                   ) : (
@@ -158,7 +158,7 @@ const MatchSchedule = () => {
                 <div className="grid grid-cols-7 items-center gap-2">
                   {/* Home Team */}
                   <div className="col-span-3 flex items-center justify-end gap-3 text-right">
-                    <span className="font-extrabold text-sm text-zinc-800 dark:text-zinc-200 truncate">{match.teamA}</span>
+                    <span className="font-extrabold text-sm text-zinc-200 truncate">{match.teamA}</span>
                     {match.teamALogo ? (
                       <img 
                         src={match.teamALogo} 
@@ -167,7 +167,7 @@ const MatchSchedule = () => {
                         onError={(e) => { e.target.style.display = 'none'; }}
                       />
                     ) : (
-                      <div className="h-6 w-6 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-[10px] font-bold text-zinc-600 dark:text-zinc-400">
+                      <div className="h-6 w-6 rounded-full bg-zinc-800 flex items-center justify-center text-[10px] font-bold text-zinc-400">
                         {match.teamA.charAt(0)}
                       </div>
                     )}
@@ -176,13 +176,13 @@ const MatchSchedule = () => {
                   {/* Middle score/VS block */}
                   <div className="col-span-1 flex justify-center text-center">
                     {isLive || isCompleted ? (
-                      <div className="flex items-center justify-center bg-zinc-200/70 dark:bg-zinc-800 px-2 py-1 rounded-lg text-sm font-extrabold text-zinc-900 dark:text-white tabular-nums">
+                      <div className="flex items-center justify-center bg-zinc-800 px-2 py-1 rounded-lg text-sm font-extrabold text-white tabular-nums">
                         <span>{match.scoreA}</span>
-                        <span className="mx-1 text-zinc-400">-</span>
+                        <span className="mx-1 text-zinc-500">-</span>
                         <span>{match.scoreB}</span>
                       </div>
                     ) : (
-                      <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500">VS</span>
+                      <span className="text-xs font-bold text-zinc-500">VS</span>
                     )}
                   </div>
 
@@ -196,11 +196,11 @@ const MatchSchedule = () => {
                         onError={(e) => { e.target.style.display = 'none'; }}
                       />
                     ) : (
-                      <div className="h-6 w-6 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-[10px] font-bold text-zinc-600 dark:text-zinc-400">
+                      <div className="h-6 w-6 rounded-full bg-zinc-800 flex items-center justify-center text-[10px] font-bold text-zinc-400">
                         {match.teamB.charAt(0)}
                       </div>
                     )}
-                    <span className="font-extrabold text-sm text-zinc-800 dark:text-zinc-200 truncate">{match.teamB}</span>
+                    <span className="font-extrabold text-sm text-zinc-200 truncate">{match.teamB}</span>
                   </div>
                 </div>
               </div>

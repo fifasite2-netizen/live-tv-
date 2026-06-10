@@ -15,11 +15,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" >
-      <body className={spaceGrotesk.className}>
+    <html lang="en">
+      <body className={`${spaceGrotesk.className} min-h-screen flex flex-col`}>
         <Navbar />
-        <main>{children}</main>
-        <Footer/>
+        <main className="flex-1 flex flex-col">{children}</main>
+        <Footer />
       </body>
     </html>
   );
