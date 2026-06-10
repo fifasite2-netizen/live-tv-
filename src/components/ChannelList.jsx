@@ -32,13 +32,28 @@ const ChannelList = ({ channels, activeChannelId, onChannelSelect }) => {
               }`}
             >
               <div
-                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg font-black text-lg transition-colors ${
+                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg font-black text-lg overflow-hidden transition-colors ${
                   isActive
-                    ? 'bg-[#E61944] text-white'
+                    ? 'bg-[#E61944]/10 text-[#E61944] border border-[#E61944]/20'
                     : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-700'
                 }`}
               >
-                {channel.name.charAt(0)}
+                {channel.logo ? (
+                  <img
+                    src={channel.logo}
+                    alt={channel.name}
+                    className="h-full w-full object-contain p-1.5"
+                    onError={e => {
+                      e.target.style.display = 'none';
+                      const parent = e.target.parentElement;
+                      if (parent) {
+                        parent.textContent = channel.name.charAt(0);
+                      }
+                    }}
+                  />
+                ) : (
+                  channel.name.charAt(0)
+                )}
               </div>
 
               <div className="flex-1 overflow-hidden">

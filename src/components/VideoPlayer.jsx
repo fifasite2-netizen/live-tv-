@@ -20,6 +20,7 @@ const VideoPlayer = ({ channelName, videoUrl }) => {
   const [quality, setQuality] = useState('1080p');
   const [isQualityOpen, setIsQualityOpen] = useState(false);
   const containerRef = useRef(null);
+  const videoRef = useRef(null);
   const controlsTimeoutRef = useRef(null);
 
   const handleUserActivity = () => {
@@ -34,6 +35,94 @@ const VideoPlayer = ({ channelName, videoUrl }) => {
       if (controlsTimeoutRef.current) clearTimeout(controlsTimeoutRef.current);
     };
   }, [channelName]);
+
+  // Synchronize playing state
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (isPlaying) {
+      video.play().catch(err => {
+        console.warn('Autoplay/play failed:', err);
+      });
+    } else {
+      video.pause();
+    }
+  }, [isPlaying]);
+
+  // Synchronize volume and mute
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = isMuted;
+    video.volume = volume / 100;
+  }, [isMuted, volume]);
+
+  // Load and play HLS (.m3u8) streams
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    let hls;
+    const isHls = videoUrl && (videoUrl.endsWith('.m3u8') || videoUrl.includes('.m3u8') || videoUrl.includes('m3u8'));
+
+    if (isHls) {
+      if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = videoUrl;
+        if (isPlaying) {
+          video.play().catch(() => {});
+        }
+      } else {
+        import('hls.js').then(({ default: Hls }) => {
+          if (!Hls.isSupported()) {
+            video.src = videoUrl;
+            return;
+          }
+
+          hls = new Hls({
+            maxMaxBufferLength: 10,
+            liveSyncDuration: 3,
+            liveMaxLatencyDuration: 10,
+          });
+
+          hls.loadSource(videoUrl);
+          hls.attachMedia(video);
+
+          hls.on(Hls.Events.MANIFEST_PARSED, () => {
+            if (isPlaying) {
+              video.play().catch(() => {});
+            }
+          });
+
+          hls.on(Hls.Events.ERROR, (event, data) => {
+            if (data.fatal) {
+              switch (data.type) {
+                case Hls.ErrorTypes.NETWORK_ERROR:
+                  hls.startLoad();
+                  break;
+                case Hls.ErrorTypes.MEDIA_ERROR:
+                  hls.recoverMediaError();
+                  break;
+                default:
+                  hls.destroy();
+                  break;
+              }
+            }
+          });
+        });
+      }
+    } else {
+      video.src = videoUrl;
+      if (isPlaying) {
+        video.play().catch(() => {});
+      }
+    }
+
+    return () => {
+      if (hls) {
+        hls.destroy();
+      }
+    };
+  }, [videoUrl]);
 
   const togglePlay = e => {
     e.stopPropagation();
@@ -68,10 +157,11 @@ const VideoPlayer = ({ channelName, videoUrl }) => {
       onClick={handleUserActivity}
     >
       <div className="absolute inset-0 flex items-center justify-center">
-        <img
-          src={videoUrl}
+        <video
+          ref={videoRef}
           alt="Live Stream"
           className={`h-full w-full object-cover transition-opacity duration-700 ${isPlaying ? 'opacity-100' : 'opacity-40 grayscale'}`}
+          playsInline
         />
         {!isPlaying && (
           <motion.button

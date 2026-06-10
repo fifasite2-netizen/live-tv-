@@ -5,7 +5,7 @@ export const CHANNELS = [
     description: 'Leading news and sports coverage from Bangladesh.',
     logo: 'S',
     viewers: '1.2M',
-    videoUrl: 'https://placehold.co/1200x400',
+    videoUrl: 'https://www.youtube.com/embed/IS6kYApyt2Y',
   },
   {
     id: 'btv',
