@@ -1,78 +1,212 @@
-import { Calendar, Clock } from 'lucide-react';
+'use client';
 
-const SCHEDULE = [
-  {
-    id: 1,
-    teamA: 'Argentina',
-    teamB: 'France',
-    time: '20:00',
-    date: 'Today',
-    group: 'Group A',
-  },
-  {
-    id: 2,
-    teamA: 'Brazil',
-    teamB: 'Germany',
-    time: '23:30',
-    date: 'Today',
-    group: 'Group B',
-  },
-  {
-    id: 3,
-    teamA: 'England',
-    teamB: 'Spain',
-    time: '18:00',
-    date: 'Tomorrow',
-    group: 'Group C',
-  },
-  {
-    id: 4,
-    teamA: 'Portugal',
-    teamB: 'Italy',
-    time: '21:00',
-    date: 'Tomorrow',
-    group: 'Group D',
-  },
-];
+import { Calendar, Clock, Trophy } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 
 const MatchSchedule = () => {
+  const [schedule, setSchedule] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState('');
+  const datesContainerRef = useRef(null);
+
+  useEffect(() => {
+    fetch('/api/schedule')
+      .then(res => res.json())
+      .then(data => {
+        if (!data.error) {
+          setSchedule(data);
+          
+          // Determine the default selected date:
+          // Find the first match that is live (state === 'in') or in the future
+          const now = new Date();
+          const activeMatch = data.find(match => {
+            return match.state === 'in' || new Date(match.rawDate) >= now;
+          });
+          
+          if (activeMatch) {
+            setSelectedDate(activeMatch.date);
+          } else if (data.length > 0) {
+            // Fallback to the first match's date
+            setSelectedDate(data[0].date);
+          }
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Fetch error:', err);
+        setLoading(false);
+      });
+  }, []);
+
+  // Extract unique dates from the schedule
+  const uniqueDates = Array.from(new Set(schedule.map(match => match.date)));
+
+  // Filter matches for the selected date
+  const filteredMatches = schedule.filter(match => match.date === selectedDate);
+
+  // Auto-scroll selected date into view within the horizontal container
+  useEffect(() => {
+    if (selectedDate && datesContainerRef.current) {
+      const activeTab = datesContainerRef.current.querySelector('[data-active="true"]');
+      if (activeTab) {
+        activeTab.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+          inline: 'center'
+        });
+      }
+    }
+  }, [selectedDate]);
+
   return (
-    <div className="space-y-4 md:hidden lg:block ">
-      <div className="flex items-center justify-between px-2">
-        <h2 className="text-lg font-bold tracking-tight flex items-center gap-2">
-          <Calendar size={20} className="text-[#E61944]" />
-          Match Schedule
+    <div className="space-y-4 rounded-2xl border border-zinc-200 dark:border-zinc-800/85 bg-white dark:bg-zinc-900/50 backdrop-blur-xl p-5 shadow-sm">
+      {/* Header */}
+      <div className="flex items-center justify-between px-1">
+        <h2 className="text-lg font-extrabold tracking-tight flex items-center gap-2 text-zinc-900 dark:text-white">
+          <Trophy size={20} className="text-[#E61944] animate-bounce" />
+          World Cup 2026
         </h2>
+        <span className="text-[10px] font-bold uppercase tracking-wider bg-red-600/10 text-red-600 dark:text-red-400 px-2 py-0.5 rounded-full">
+          Live Schedule
+        </span>
       </div>
-      <div className="grid grid-cols-1 gap-3">
-        {SCHEDULE.map(match => (
-          <div
-            key={match.id}
-            className="flex items-center justify-between rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 transition-colors hover:border-zinc-300 dark:hover:border-zinc-700"
-          >
-            <div className="flex flex-col gap-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                {match.group}
-              </span>
-              <div className="flex items-center gap-3">
-                <span className="font-bold text-sm">{match.teamA}</span>
-                <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                  vs
-                </span>
-                <span className="font-bold text-sm">{match.teamB}</span>
-              </div>
-            </div>
-            <div className="flex flex-col items-end gap-1">
-              <div className="flex items-center gap-1.5 text-[#E61944]">
-                <Clock size={12} />
-                <span className="text-xs font-bold">{match.time}</span>
-              </div>
-              <span className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400">
-                {match.date}
-              </span>
-            </div>
+
+      {/* Date Selector Tabs */}
+      {loading ? (
+        <div className="h-12 flex items-center gap-2 overflow-x-hidden">
+          {[1, 2, 3, 4, 5].map(i => (
+            <div key={i} className="h-10 w-16 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800 flex-shrink-0" />
+          ))}
+        </div>
+      ) : uniqueDates.length > 0 ? (
+        <div 
+          ref={datesContainerRef}
+          className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none -mx-1 px-1 touch-pan-x"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {uniqueDates.map(dateStr => {
+            const isActive = dateStr === selectedDate;
+            const [monthDay, weekday] = dateStr.split(', ');
+            const shortWeekday = weekday ? weekday.substring(0, 3).toUpperCase() : '';
+            
+            return (
+              <button
+                key={dateStr}
+                data-active={isActive}
+                onClick={() => setSelectedDate(dateStr)}
+                className={`flex flex-col items-center justify-center min-w-[75px] py-1.5 px-3 rounded-xl border text-center transition-all ${
+                  isActive 
+                    ? 'bg-[#E61944] border-[#E61944] text-white shadow-md shadow-[#E61944]/25 scale-105' 
+                    : 'bg-zinc-50 dark:bg-zinc-900/30 border-zinc-150 dark:border-zinc-800/80 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                }`}
+              >
+                <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">{shortWeekday}</span>
+                <span className="text-xs font-extrabold">{monthDay}</span>
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+
+      {/* Match Cards List */}
+      <div className="grid grid-cols-1 gap-3 min-h-[150px]">
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-12 text-zinc-500 gap-2">
+            <span className="h-6 w-6 animate-spin rounded-full border-2 border-[#E61944] border-t-transparent" />
+            <span className="text-xs font-semibold">Loading fixtures...</span>
           </div>
-        ))}
+        ) : filteredMatches.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12 text-zinc-400 dark:text-zinc-500 border border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl">
+            <Calendar size={28} className="opacity-40 mb-2" />
+            <span className="text-xs font-medium">No matches scheduled for this date</span>
+          </div>
+        ) : (
+          filteredMatches.map(match => {
+            const isLive = match.state === 'in';
+            const isCompleted = match.state === 'post';
+            
+            return (
+              <div
+                key={match.id}
+                className={`flex flex-col gap-3 rounded-xl border p-4 transition-all ${
+                  isLive 
+                    ? 'border-red-500/30 bg-red-500/5 dark:bg-red-950/10 shadow-sm'
+                    : 'border-zinc-200 dark:border-zinc-800/60 bg-zinc-50/50 dark:bg-zinc-900/20 hover:border-zinc-300 dark:hover:border-zinc-700'
+                }`}
+              >
+                {/* Meta details (group name + status indicator) */}
+                <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                  <span>{match.group}</span>
+                  {isLive ? (
+                    <div className="flex items-center gap-1.5 text-red-600 dark:text-red-400">
+                      <span className="h-2 w-2 animate-ping rounded-full bg-red-600" />
+                      <span>{match.statusText}</span>
+                    </div>
+                  ) : isCompleted ? (
+                    <span className="text-zinc-500 dark:text-zinc-400 bg-zinc-200/50 dark:bg-zinc-800 px-1.5 py-0.5 rounded">
+                      FT
+                    </span>
+                  ) : (
+                    <div className="flex items-center gap-1 text-[#E61944]">
+                      <Clock size={11} />
+                      <span>{match.time}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Main competitors section */}
+                <div className="grid grid-cols-7 items-center gap-2">
+                  {/* Home Team */}
+                  <div className="col-span-3 flex items-center justify-end gap-3 text-right">
+                    <span className="font-extrabold text-sm text-zinc-800 dark:text-zinc-200 truncate">{match.teamA}</span>
+                    {match.teamALogo ? (
+                      <img 
+                        src={match.teamALogo} 
+                        alt="" 
+                        className="h-6 w-6 object-contain rounded-sm"
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
+                    ) : (
+                      <div className="h-6 w-6 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-[10px] font-bold text-zinc-600 dark:text-zinc-400">
+                        {match.teamA.charAt(0)}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Middle score/VS block */}
+                  <div className="col-span-1 flex justify-center text-center">
+                    {isLive || isCompleted ? (
+                      <div className="flex items-center justify-center bg-zinc-200/70 dark:bg-zinc-800 px-2 py-1 rounded-lg text-sm font-extrabold text-zinc-900 dark:text-white tabular-nums">
+                        <span>{match.scoreA}</span>
+                        <span className="mx-1 text-zinc-400">-</span>
+                        <span>{match.scoreB}</span>
+                      </div>
+                    ) : (
+                      <span className="text-xs font-bold text-zinc-400 dark:text-zinc-500">VS</span>
+                    )}
+                  </div>
+
+                  {/* Away Team */}
+                  <div className="col-span-3 flex items-center justify-start gap-3 text-left">
+                    {match.teamBLogo ? (
+                      <img 
+                        src={match.teamBLogo} 
+                        alt="" 
+                        className="h-6 w-6 object-contain rounded-sm"
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
+                    ) : (
+                      <div className="h-6 w-6 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-[10px] font-bold text-zinc-600 dark:text-zinc-400">
+                        {match.teamB.charAt(0)}
+                      </div>
+                    )}
+                    <span className="font-extrabold text-sm text-zinc-800 dark:text-zinc-200 truncate">{match.teamB}</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );

@@ -6,16 +6,18 @@ import { Tv, ChevronRight, Activity } from 'lucide-react';
 const ChannelList = ({ channels, activeChannelId, onChannelSelect }) => {
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between px-2">
-        <h2 className="text-lg font-bold tracking-tight flex items-center gap-2">
+      {/* List Header */}
+      <div className="flex items-center justify-between px-1">
+        <h2 className="text-lg font-extrabold tracking-tight flex items-center gap-2 text-white">
           <Tv size={20} className="text-[#E61944]" />
           Live Channels
         </h2>
-        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
-          {channels.length} Available
+        <span className="text-[10px] font-extrabold uppercase tracking-wider bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded-full">
+          {channels.length} Online
         </span>
       </div>
 
+      {/* Grid Container */}
       <div className="grid grid-cols-1 gap-3">
         {channels.map(channel => {
           const isActive = activeChannelId === channel.id;
@@ -25,24 +27,25 @@ const ChannelList = ({ channels, activeChannelId, onChannelSelect }) => {
               whileHover={{ x: 4 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => onChannelSelect(channel)}
-              className={`group relative flex items-center gap-4 rounded-xl border p-4 text-left transition-all duration-300 ${
+              className={`group relative flex items-center gap-4 rounded-2xl border p-4 text-left transition-all duration-300 cursor-pointer ${
                 isActive
-                  ? 'border-[#E61944] bg-[#E61944]/5 shadow-md'
-                  : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
+                  ? 'border-red-500 bg-red-950/10 shadow-[0_0_15px_rgba(230,25,68,0.08)]'
+                  : 'border-zinc-800 bg-zinc-900/40 hover:border-zinc-700 hover:bg-zinc-800/40'
               }`}
             >
+              {/* Channel Logo / Placeholder */}
               <div
-                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg font-black text-lg overflow-hidden transition-colors ${
+                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl font-extrabold text-lg overflow-hidden transition-all duration-300 ${
                   isActive
-                    ? 'bg-[#E61944]/10 text-[#E61944] border border-[#E61944]/20'
-                    : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 group-hover:bg-zinc-200 dark:group-hover:bg-zinc-700'
+                    ? 'bg-red-500/10 text-red-500 border border-red-500/20'
+                    : 'bg-zinc-800 text-zinc-400 group-hover:bg-zinc-700 border border-transparent'
                 }`}
               >
                 {channel.logo ? (
                   <img
                     src={channel.logo}
-                    alt={channel.name}
-                    className="h-full w-full object-contain p-1.5"
+                    alt=""
+                    className="h-full w-full object-contain p-1.5 transition-transform group-hover:scale-105"
                     onError={e => {
                       e.target.style.display = 'none';
                       const parent = e.target.parentElement;
@@ -56,37 +59,44 @@ const ChannelList = ({ channels, activeChannelId, onChannelSelect }) => {
                 )}
               </div>
 
+              {/* Text Info */}
               <div className="flex-1 overflow-hidden">
                 <div className="flex items-center justify-between">
                   <h3
-                    className={`font-bold truncate ${isActive ? 'text-[#E61944]' : 'text-zinc-900 dark:text-zinc-100'}`}
+                    className={`font-bold text-sm truncate ${isActive ? 'text-red-500' : 'text-zinc-100'}`}
                   >
                     {channel.name}
                   </h3>
                   {isActive && (
                     <Activity
-                      size={14}
-                      className="text-[#E61944] animate-pulse"
+                      size={13}
+                      className="text-red-500 animate-pulse shrink-0 ml-2"
                     />
                   )}
                 </div>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate mt-0.5">
+                <p className="text-xs text-zinc-400 truncate mt-0.5">
                   {channel.description}
                 </p>
-                <div className="mt-2 flex items-center gap-2">
-                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-red-500" />
-                  <span className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                
+                {/* Live indicators */}
+                <div className="mt-2.5 flex items-center gap-1.5">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-red-500"></span>
+                  </span>
+                  <span className="text-[10px] font-bold text-zinc-450 uppercase tracking-wider">
                     {channel.viewers} watching
                   </span>
                 </div>
               </div>
 
+              {/* Action Chevron */}
               <ChevronRight
                 size={18}
-                className={`transition-transform duration-300 ${
+                className={`transition-all duration-300 shrink-0 ${
                   isActive
-                    ? 'translate-x-0 text-[#E61944]'
-                    : '-translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100'
+                    ? 'translate-x-0 text-red-500 opacity-100'
+                    : '-translate-x-2 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 text-zinc-550'
                 }`}
               />
             </motion.button>
