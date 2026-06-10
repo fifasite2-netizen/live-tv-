@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { Menu, X, Trophy } from 'lucide-react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { usePathname } from 'next/navigation';
+
 
 const navLinks = [
   { href: '/live', label: 'Live Now' },
@@ -12,6 +14,10 @@ const navLinks = [
 ];
 
 const Navbar = () => {
+
+  const pathName = usePathname()
+  console.log(pathName);
+
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -46,18 +52,24 @@ const Navbar = () => {
           </button>
 
           <nav className="hidden lg:flex items-center gap-8">
-            {navLinks.map(nav => (
-              <Link
-                key={nav.href}
-                href={nav.href}
-                className="text-sm font-semibold text-zinc-400 hover:text-[#E61944] transition-colors relative py-1"
-              >
-                {nav.label}
-              </Link>
-            ))}
-            <button className="rounded-xl bg-[#E61944] px-5 py-2 text-sm font-bold text-white hover:bg-red-700 shadow-md shadow-[#E61944]/15 hover:shadow-[#E61944]/25 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer transition-all">
-              Sign In
-            </button>
+            {navLinks.map(nav => {
+              const isActive = pathName.startsWith(nav.href);
+              return (
+                <Link
+                  key={nav.href}
+                  href={nav.href}
+                  className={`text-sm font-semibold transition-colors relative py-1 flex items-center gap-1.5 ${
+                    isActive ? 'text-[#E61944]' : 'text-zinc-400 hover:text-[#E61944]'
+                  }`}
+                >
+                  {nav.label}
+                  {isActive && (
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#E61944]" />
+                  )}
+                </Link>
+              );
+            })}
+            
           </nav>
         </div>
 
@@ -71,16 +83,26 @@ const Navbar = () => {
               transition={{ duration: 0.2 }}
               className="lg:hidden mt-4 pt-4 border-t border-zinc-800/80 flex flex-col gap-3 overflow-hidden"
             >
-              {navLinks.map(nav => (
-                <Link
-                  key={nav.href}
-                  href={nav.href}
-                  onClick={() => setIsOpen(false)}
-                  className="text-sm font-semibold text-zinc-400 hover:text-white hover:bg-zinc-900/60 px-3 py-2.5 rounded-xl border border-transparent hover:border-zinc-800/50 transition-all"
-                >
-                  {nav.label}
-                </Link>
-              ))}
+              {navLinks.map(nav => {
+                const isActive = pathName.startsWith(nav.href);
+                return (
+                  <Link
+                    key={nav.href}
+                    href={nav.href}
+                    onClick={() => setIsOpen(false)}
+                    className={`text-sm font-semibold px-3 py-2.5 rounded-xl border transition-all flex items-center justify-between ${
+                      isActive 
+                        ? 'text-white bg-[#E61944]/10 border-[#E61944]/20' 
+                        : 'text-zinc-400 hover:text-white hover:bg-zinc-900/60 border-transparent hover:border-zinc-800/50'
+                    }`}
+                  >
+                    <span>{nav.label}</span>
+                    {isActive && (
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#E61944]" />
+                    )}
+                  </Link>
+                );
+              })}
               <button className="w-full rounded-xl bg-[#E61944] py-3 text-sm font-bold text-white hover:bg-red-700 transition-all mt-2 shadow-lg shadow-[#E61944]/15 cursor-pointer">
                 Sign In
               </button>
