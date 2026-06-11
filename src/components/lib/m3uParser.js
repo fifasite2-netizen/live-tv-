@@ -28,9 +28,28 @@ export function parseM3U(text) {
       // Extract group-title
       const groupMatch = line.match(/group-title="([^"]+)"/i);
       
-      // Extract name (everything after the last comma)
-      const commaIndex = line.lastIndexOf(',');
-      const name = commaIndex !== -1 ? line.substring(commaIndex + 1).trim() : 'Unknown Channel';
+      // Find first comma outside quotes to separate metadata from name
+      let commaIndex = -1;
+      let inQuotes = false;
+      for (let j = 0; j < line.length; j++) {
+        if (line[j] === '"') {
+          inQuotes = !inQuotes;
+        } else if (line[j] === ',' && !inQuotes) {
+          commaIndex = j;
+          break;
+        }
+      }
+
+      const namePart = commaIndex !== -1 ? line.substring(commaIndex + 1).trim() : 'Unknown Channel';
+      
+      let name = namePart;
+      let channelCount = '';
+      
+      const lastCommaInName = namePart.lastIndexOf(',');
+      if (lastCommaInName !== -1) {
+        name = namePart.substring(0, lastCommaInName).trim();
+        channelCount = namePart.substring(lastCommaInName + 1).trim();
+      }
       
       const tvgId = idMatch ? idMatch[1] : '';
       const cleanNameKey = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -45,7 +64,8 @@ export function parseM3U(text) {
         group: group,
         description: `Live stream from category ${group || 'General'}.`,
         viewers: stats.viewers,
-        videoUrl: ''
+        videoUrl: '',
+        channelCount: channelCount
       };
     } else if (line.startsWith('#')) {
       // Ignore comments or other directives like #EXTVLCOPT

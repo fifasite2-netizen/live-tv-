@@ -4,6 +4,7 @@ import { Share2 } from 'lucide-react';
 
 const StreamHeader = ({ 
   title = 'FIFA World Cup 2026: Group Stage', 
+  channelCount = '',
   location = 'Live from MetLife Stadium, East Rutherford' 
 }) => {
   const handleShare = async () => {
@@ -38,9 +39,16 @@ const StreamHeader = ({
   return (
     <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-6">
       <div className="min-w-0 flex-1">
-        <h1 className="text-lg sm:text-2xl font-bold tracking-tight md:text-3xl text-white truncate">
-          {title}
-        </h1>
+        <div className="flex items-center gap-2 flex-wrap">
+          <h1 className="text-lg sm:text-2xl font-bold tracking-tight md:text-3xl text-white truncate">
+            {title}
+          </h1>
+          {channelCount && (
+            <span className="text-[10px] sm:text-xs font-extrabold px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700/60 uppercase tracking-wider shrink-0">
+              {channelCount}
+            </span>
+          )}
+        </div>
         <p className="mt-1 text-xs sm:text-sm text-zinc-400 truncate">
           {location}
         </p>

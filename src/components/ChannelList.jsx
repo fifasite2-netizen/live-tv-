@@ -61,16 +61,29 @@ const ChannelList = ({ channels, activeChannelId, onChannelSelect }) => {
 
               {/* Text Info */}
               <div className="flex-1 overflow-hidden">
-                <div className="flex items-center justify-between">
-                  <h3
-                    className={`font-bold text-sm truncate ${isActive ? 'text-red-500' : 'text-zinc-100'}`}
-                  >
-                    {channel.name}
-                  </h3>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <h3
+                      className={`font-bold text-sm truncate ${isActive ? 'text-red-500' : 'text-zinc-100'}`}
+                    >
+                      {channel.name}
+                    </h3>
+                    {channel.channelCount && (
+                      <span
+                        className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0 transition-all duration-300 border ${
+                          isActive
+                            ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                            : 'bg-zinc-800 text-zinc-400 border-zinc-700/60'
+                        }`}
+                      >
+                        {channel.channelCount}
+                      </span>
+                    )}
+                  </div>
                   {isActive && (
                     <Activity
                       size={13}
-                      className="text-red-500 animate-pulse shrink-0 ml-2"
+                      className="text-red-500 animate-pulse shrink-0"
                     />
                   )}
                 </div>

@@ -30,7 +30,6 @@ export default function Home() {
         setIsLoading(false);
       })
       .catch(err => {
-        console.error('Failed to fetch M3U playlist:', err);
         setIsLoading(false);
       });
   }, []);
@@ -48,6 +47,7 @@ export default function Home() {
             {activeChannel ? (
               <VideoPlayer
                 channelName={activeChannel.name}
+                channelCount={activeChannel.channelCount}
                 videoUrl={activeChannel.videoUrl}
               />
             ) : (
@@ -68,6 +68,7 @@ export default function Home() {
           <div className="px-6 lg:px-0">
             <StreamHeader
               title={activeChannel ? activeChannel.name : 'Live Stream'}
+              channelCount={activeChannel ? activeChannel.channelCount : ''}
               location={
                 activeChannel
                   ? `Category: ${activeChannel.group}`

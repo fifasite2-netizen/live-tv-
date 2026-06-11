@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const VideoPlayer = ({ channelName, videoUrl }) => {
+const VideoPlayer = ({ channelName, channelCount, videoUrl }) => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(80);
@@ -280,6 +280,11 @@ const VideoPlayer = ({ channelName, videoUrl }) => {
         <h2 className="text-sm sm:text-sm font-bold text-white tracking-wide">
           {channelName}
         </h2>
+        {channelCount && (
+          <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-zinc-800/80 text-zinc-400 border border-zinc-700/60 uppercase tracking-wider shrink-0">
+            {channelCount}
+          </span>
+        )}
       </div>
 
       <div
