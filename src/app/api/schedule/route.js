@@ -39,16 +39,24 @@ export async function GET() {
       if (event.date) {
         const dateObj = new Date(event.date);
         
-        // AM/PM on left side: e.g. "PM 09:00"
-        const hours = dateObj.getHours();
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        const displayHours = String(hours % 12 || 12).padStart(2, '0');
-        const displayMinutes = String(dateObj.getMinutes()).padStart(2, '0');
-        timeStr = `${displayHours}:${displayMinutes} ${ampm}`;
+        // Format time in Bangladesh time zone (Asia/Dhaka)
+        timeStr = dateObj.toLocaleTimeString('en-US', {
+          timeZone: 'Asia/Dhaka',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
         
-        // Day name to the right: e.g. "Jun 28, Sunday"
-        const monthDay = dateObj.toLocaleDateString([], { month: 'short', day: 'numeric' });
-        const weekday = dateObj.toLocaleDateString([], { weekday: 'long' });
+        // Format date in Bangladesh time zone (Asia/Dhaka)
+        const monthDay = dateObj.toLocaleDateString('en-US', {
+          timeZone: 'Asia/Dhaka',
+          month: 'short',
+          day: 'numeric'
+        });
+        const weekday = dateObj.toLocaleDateString('en-US', {
+          timeZone: 'Asia/Dhaka',
+          weekday: 'long'
+        });
         dateStr = `${monthDay}, ${weekday}`;
       }
       
