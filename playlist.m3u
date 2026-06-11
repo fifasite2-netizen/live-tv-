@@ -1,12 +1,18 @@
 #EXTM3U
-#EXTINF:-1 tvg-id="TSports.bd@SD" tvg-logo="https://i.imgur.com/2JzlorD.png" group-title="Sports",T Sports (720p), CH 1
+
+#EXTINF:-1 tvg-id="TSports.bd@SD" tvg-logo="https://i.imgur.com/2JzlorD.png" group-title="Sports",T Sports HD CH 1
+https://amitomar.bdixbd.net/hoichoi.pro1/tracks-v1a1/index.m3u8
+
+#EXTINF:-1 tvg-id="TSports.bd@SD" tvg-logo="https://i.imgur.com/2JzlorD.png" group-title="Sports",T Sports CH 2
 https://tvsen7.aynaott.com/tsports-hd/index.m3u8
 
-#EXTINF:-1 tvg-id="TSports.bd@SD" tvg-logo="https://i.imgur.com/2JzlorD.png" group-title="Sports",T Sports HD (1080p) CH 2
+#EXTINF:-1 tvg-id="TSports.bd@SD" tvg-logo="https://i.imgur.com/2JzlorD.png" group-title="Sports",T Sports HD (1080p) CH 3
 https://tvsen7.aynaott.com/tsportsfhd/index.m3u8
+
 
 #EXTINF:-1 tvg-id="PTVSports.pk@SD" tvg-logo="https://i.imgur.com/CPm6GHA.png" group-title="Sports",PTV Sports (1080p), CH 1
 https://tvsen5.aynaott.com/Ptvsports/index.m3u8
+
 
 #EXTINF:-1 tvg-id="BTVNational.bd@SD" tvg-logo="https://i.imgur.com/5OE2FDt.png" group-title="General",BTV National (1080p), CH 1
 https://owrcovcrpy.gpcdn.net/bpk-tv/1709/output/1709.m3u8
