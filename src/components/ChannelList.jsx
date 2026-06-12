@@ -7,7 +7,7 @@ const ChannelList = ({ channels, activeChannelId, onChannelSelect }) => {
   return (
     <div className="flex flex-col gap-4">
       {/* List Header */}
-      <div className="flex items-center justify-between px-1">
+      <div className="flex items-center justify-between px-1 pb-2">
         <h2 className="text-lg font-extrabold tracking-tight flex items-center gap-2 text-white">
           <Tv size={20} className="text-[#E61944]" />
           Live Channels
