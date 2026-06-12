@@ -47,3 +47,23 @@ body {
 .glow-red {
   box-shadow: 0 0 25px rgba(230, 25, 68, 0.12);
 }
+
+/* Custom scrollbar styling for channel list */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(63, 63, 70, 0.4);
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(82, 82, 91, 0.6);
+}
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(63, 63, 70, 0.4) transparent;
+}
+
