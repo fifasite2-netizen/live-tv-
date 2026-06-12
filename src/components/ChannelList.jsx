@@ -7,7 +7,7 @@ const ChannelList = ({ channels, activeChannelId, onChannelSelect }) => {
   return (
     <div className="flex flex-col gap-4">
       {/* List Header */}
-      <div className="flex items-center justify-between px-1">
+      <div className="flex absolute items-center justify-between px-1">
         <h2 className="text-lg font-extrabold tracking-tight flex items-center gap-2 text-white">
           <Tv size={20} className="text-[#E61944]" />
           Live Channels
@@ -18,7 +18,7 @@ const ChannelList = ({ channels, activeChannelId, onChannelSelect }) => {
       </div>
 
       {/* Grid Container */}
-      <div className="grid grid-cols-1 gap-3">
+      <div className=" grid grid-cols-1 gap-3">
         {channels.map(channel => {
           const isActive = activeChannelId === channel.id;
           return (

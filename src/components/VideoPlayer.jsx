@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const VideoPlayer = ({ channelName, channelCount, videoUrl }) => {
+const VideoPlayer = ({ channelName, channelCount, videoUrl, isMobileSticky = false }) => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(80);
@@ -70,9 +70,47 @@ const VideoPlayer = ({ channelName, channelCount, videoUrl }) => {
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+
+    // Do not play/pause if no source is loaded yet
+    const hasSource = video.src || hlsRef.current;
+    if (!hasSource) return;
+
     if (isPlaying) {
-      video.play().catch(err => {
-        console.warn('Autoplay/play failed:', err);
+      // Seek to live edge for live streams on play/resume
+      if (hlsRef.current) {
+        hlsRef.current.startLoad();
+      }
+
+      try {
+        if (hlsRef.current) {
+          const livePos = hlsRef.current.liveSyncPosition;
+          if (livePos !== null && livePos !== undefined && !isNaN(livePos)) {
+            if (livePos - video.currentTime > 0.5) {
+              video.currentTime = livePos;
+            }
+          } else if (video.seekable && video.seekable.length > 0) {
+            const seekableStart = video.seekable.start(0);
+            const seekableEnd = video.seekable.end(video.seekable.length - 1);
+            const targetTime = Math.max(seekableStart, seekableEnd - 2);
+            if (targetTime - video.currentTime > 0.5) {
+              video.currentTime = targetTime;
+            }
+          }
+        } else if (video.seekable && video.seekable.length > 0) {
+          const seekableStart = video.seekable.start(0);
+          const seekableEnd = video.seekable.end(video.seekable.length - 1);
+          const targetTime = Math.max(seekableStart, seekableEnd - 2);
+          if (targetTime - video.currentTime > 0.5) {
+            video.currentTime = targetTime;
+          }
+        }
+      } catch (seekError) {
+        console.warn('[VideoPlayer] Seeking to live edge failed:', seekError);
+      }
+
+      video.play().then(() => {
+      }).catch(err => {
+        console.warn('[VideoPlayer] video.play() failed:', err);
         setIsPlaying(false);
       });
     } else {
@@ -127,6 +165,10 @@ const VideoPlayer = ({ channelName, channelCount, videoUrl }) => {
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+
+    // Reset playing state to true for autoplay when channel changes
+    setIsPlaying(true);
+    isPlayingRef.current = true;
 
     let hls;
     const isHls = videoUrl && (videoUrl.endsWith('.m3u8') || videoUrl.includes('.m3u8') || videoUrl.includes('m3u8'));
@@ -272,27 +314,38 @@ const VideoPlayer = ({ channelName, channelCount, videoUrl }) => {
       onMouseMove={handleUserActivity}
     >
       {/* Live Badge and Channel Name on top (outside the main video player) */}
-      <div className="flex items-center gap-2.5 mb-3.5 px-4 lg:px-0">
-        <div className="flex items-center gap-1.5 rounded-md bg-[#E61944] px-1.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-md">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
-          Live
-        </div>
-        <h2 className="text-sm sm:text-sm font-bold text-white tracking-wide">
-          {channelName}
-        </h2>
-        {channelCount && (
-          <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-zinc-800/80 text-zinc-400 border border-zinc-700/60 uppercase tracking-wider shrink-0">
-            {channelCount}
-          </span>
+      <AnimatePresence initial={false}>
+        {!isMobileSticky && (
+          <motion.div
+            initial={{ height: 0, opacity: 0, marginBottom: 0 }}
+            animate={{ height: 'auto', opacity: 1, marginBottom: '0.875rem' }}
+            exit={{ height: 0, opacity: 0, marginBottom: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            className="flex items-center gap-2.5 px-4 lg:px-0 overflow-hidden"
+          >
+            <div className="flex items-center gap-1.5 rounded-md bg-[#E61944] px-1.5 py-1 text-[10px] font-extrabold uppercase tracking-wider text-white shadow-md">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
+              Live
+            </div>
+            <h2 className="text-sm sm:text-sm font-bold text-white tracking-wide">
+              {channelName}
+            </h2>
+            {channelCount && (
+              <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-zinc-800/80 text-zinc-400 border border-zinc-700/60 uppercase tracking-wider shrink-0">
+                {channelCount}
+              </span>
+            )}
+          </motion.div>
         )}
-      </div>
-
+      </AnimatePresence>
       <div
         ref={containerRef}
         className={`group relative bg-black shadow-2xl scrollbar-none transition-all duration-300 ${
           isFullScreen 
             ? 'w-screen h-screen rounded-none ring-0' 
-            : 'aspect-video w-full ring-1 ring-white/10 lg:rounded-2xl'
+            : `aspect-video w-full ring-1 ring-white/10 lg:rounded-2xl ${
+                isMobileSticky ? 'rounded-xl shadow-xl' : 'rounded-none'
+              }`
         }`}
         onMouseMove={handleUserActivity}
         onClick={handleUserActivity}

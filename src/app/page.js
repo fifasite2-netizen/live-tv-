@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import ChannelList from '@/components/ChannelList';
 import VideoPlayer from '@/components/VideoPlayer';
@@ -15,6 +15,53 @@ export default function Home() {
   const [activeChannel, setActiveChannel] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('channels');
+  
+  const [isSticky, setIsSticky] = useState(false);
+  const [videoHeight, setVideoHeight] = useState(0);
+  const videoContainerRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsSticky(window.scrollY > 20);
+    };
+
+    const mediaQuery = window.matchMedia('(max-width: 1023px)');
+    if (mediaQuery.matches) {
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      handleScroll();
+    }
+
+    const listener = (e) => {
+      if (e.matches) {
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll();
+      } else {
+        window.removeEventListener('scroll', handleScroll);
+        setIsSticky(false);
+      }
+    };
+    
+    mediaQuery.addEventListener('change', listener);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      mediaQuery.removeEventListener('change', listener);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!videoContainerRef.current) return;
+    
+    const element = videoContainerRef.current;
+    const observer = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        setVideoHeight(entry.target.getBoundingClientRect().height);
+      }
+    });
+    
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     fetch('/api/channels')
@@ -39,30 +86,40 @@ export default function Home() {
       <div className="grid grid-cols-1 gap-6 lg:gap-8 lg:grid-cols-12">
         {/* Left Main Content Column */}
         <div className="lg:col-span-8 space-y-6 lg:space-y-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="w-full scrollbar-none"
+          <div
+            ref={videoContainerRef}
+            className={`w-full transition-all duration-300 max-lg:sticky max-lg:top-0 max-lg:z-40 ${
+              isSticky
+                ? 'max-lg:px-4 max-lg:py-2.5 max-lg:bg-zinc-950/90 max-lg:backdrop-blur-md max-lg:shadow-lg max-lg:border-b max-lg:border-zinc-800/40'
+                : 'max-lg:p-0'
+            }`}
           >
-            {activeChannel ? (
-              <VideoPlayer
-                channelName={activeChannel.name}
-                channelCount={activeChannel.channelCount}
-                videoUrl={activeChannel.videoUrl}
-              />
-            ) : (
-              <div className="aspect-video w-full rounded-2xl bg-zinc-950 flex flex-col items-center justify-center text-zinc-550 font-medium">
-                {isLoading ? (
-                  <div className="flex flex-col items-center gap-3">
-                    <span className="h-8 w-8 animate-spin rounded-full border-4 border-red-650 border-t-transparent" />
-                    <span>Loading channels...</span>
-                  </div>
-                ) : (
-                  <span>No channels found</span>
-                )}
-              </div>
-            )}
-          </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="w-full scrollbar-none"
+            >
+              {activeChannel ? (
+                <VideoPlayer
+                  channelName={activeChannel.name}
+                  channelCount={activeChannel.channelCount}
+                  videoUrl={activeChannel.videoUrl}
+                  isMobileSticky={isSticky}
+                />
+              ) : (
+                <div className="aspect-video w-full rounded-2xl bg-zinc-950 flex flex-col items-center justify-center text-zinc-550 font-medium">
+                  {isLoading ? (
+                    <div className="flex flex-col items-center gap-3">
+                      <span className="h-8 w-8 animate-spin rounded-full border-4 border-red-650 border-t-transparent" />
+                      <span>Loading channels...</span>
+                    </div>
+                  ) : (
+                    <span>No channels found</span>
+                  )}
+                </div>
+              )}
+            </motion.div>
+          </div>
 
           {/* Stream Info Header */}
           <div className="px-6 lg:px-0">
@@ -77,7 +134,10 @@ export default function Home() {
             />
           </div>
 
-          <div className="lg:hidden sticky top-[72px] z-30 bg-zinc-950/80 backdrop-blur-md px-6 py-3 border-b border-zinc-800/60 mb-2">
+          <div
+            style={{ top: `${videoHeight}px` }}
+            className="lg:hidden sticky z-30 bg-zinc-950/80 backdrop-blur-md px-6 py-3 border-b border-zinc-800/60 mb-2 transition-all duration-300"
+          >
             <div className="flex bg-zinc-900/60 p-1 rounded-xl border border-zinc-800/80">
               {[
                 { id: 'channels', label: 'Channels' },

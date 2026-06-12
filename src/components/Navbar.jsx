@@ -16,12 +16,12 @@ const navLinks = [
 const Navbar = () => {
 
   const pathName = usePathname()
-  console.log(pathName);
+
 
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-800/60 bg-zinc-950/70 backdrop-blur-xl px-6 py-4 text-white">
+    <header className="lg:sticky top-0 z-50 border-b border-zinc-800/60 bg-zinc-950/70 backdrop-blur-xl px-6 py-4 text-white">
       <div className="max-w-7xl w-full mx-auto">
         <div className="flex items-center justify-between">
           <Link
