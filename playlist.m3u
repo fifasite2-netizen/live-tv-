@@ -1,7 +1,11 @@
 #EXTM3U
 
-#EXTINF:-1 tvg-id="Bein Sports" tvg-logo="https://s3.aynaott.com/storage/04a56bc13c4c486ad4a4d82a1e00fd73" group-title="Sports",Bein Sports CH 1
-http://fl1.moveonjoy.com/BEIN_SPORTS/index.m3u8
+#EXTINF:-1 tvg-id="FIFA 1" tvg-logo="https://i.ibb.co.com/vnbkF0r/fifa-world-cup-2026-logo-png-seeklogo-665644.png" group-title="Sports",FIFA CH 1
+https://cdn.yallashooot.pp.ua/hls/ch1.m3u8
+
+
+#EXTINF:-1 tvg-id="FIFA 2" tvg-logo="https://i.ibb.co.com/vnbkF0r/fifa-world-cup-2026-logo-png-seeklogo-665644.png" group-title="Sports",FIFA CH 2
+https://s3.us-east-1.amazonaws.com/yalapro1/hls/0/stream.m3u8
 
 #EXTINF:-1 tvg-id="FIFAPlus.uk@UnitedStates" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/FIFA%2B_(2025).svg/960px-FIFA%2B_(2025).svg.png" group-title="Sports",FIFA+ (720p), CH 1
 https://d2w9q46ikgrcwx.cloudfront.net/v1/sysdata_s_p_a_fifa_7/samsungheadend_us/latest/main/hls/playlist.m3u8
@@ -12,5 +16,8 @@ https://d2w9q46ikgrcwx.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68
 
 #EXTINF:-1 tvg-id="FIFAPlus.uk@English" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/FIFA%2B_(2025).svg/960px-FIFA%2B_(2025).svg.png" group-title="Sports",FIFA+ English (720p), CH 3
 https://a62dad94.wurl.com/master/f36d25e7e52f1ba8d7e56eb859c636563214f541/UmFrdXRlblRWLWV1X0ZJRkFQbHVzRW5nbGlzaF9ITFM/playlist.m3u8
+
+
+
 
 
