@@ -7,26 +7,36 @@ import {
   Volume2,
   VolumeX,
   Maximize,
+  Minimize,
   Settings,
   Radio,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const VideoPlayer = ({ channelName, channelCount, videoUrl, isMobileSticky = false }) => {
+const VideoPlayer = ({
+  channelName,
+  channelCount,
+  videoUrl,
+  isMobileSticky = false,
+}) => {
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(80);
   const [showControls, setShowControls] = useState(true);
   const [quality, setQuality] = useState('Auto');
   const [isQualityOpen, setIsQualityOpen] = useState(false);
-  const [qualityOptions, setQualityOptions] = useState([{ index: -1, label: 'Auto' }]);
+  const [qualityOptions, setQualityOptions] = useState([
+    { index: -1, label: 'Auto' },
+  ]);
   const [isWaiting, setIsWaiting] = useState(true);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isIOSFullscreen, setIsIOSFullscreen] = useState(false);
   const containerRef = useRef(null);
   const videoRef = useRef(null);
   const controlsTimeoutRef = useRef(null);
   const hlsRef = useRef(null);
   const isPlayingRef = useRef(isPlaying);
+  const lastTapRef = useRef(0);
 
   useEffect(() => {
     isPlayingRef.current = isPlaying;
@@ -34,17 +44,34 @@ const VideoPlayer = ({ channelName, channelCount, videoUrl, isMobileSticky = fal
 
   useEffect(() => {
     const handleFullScreenChange = () => {
-      setIsFullScreen(
-        !!(document.fullscreenElement || document.webkitFullscreenElement)
-      );
+      const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
+      setIsFullScreen(isFS);
+
+      // Unlock orientation when exiting fullscreen
+      if (!isFS && screen?.orientation?.unlock) {
+        try { screen.orientation.unlock(); } catch (_) {}
+      }
     };
 
     document.addEventListener('fullscreenchange', handleFullScreenChange);
     document.addEventListener('webkitfullscreenchange', handleFullScreenChange);
 
+    // iOS Safari: listen for native video fullscreen events
+    const video = videoRef.current;
+    const handleIOSBegin = () => { setIsFullScreen(true); setIsIOSFullscreen(true); };
+    const handleIOSEnd = () => { setIsFullScreen(false); setIsIOSFullscreen(false); };
+    if (video) {
+      video.addEventListener('webkitbeginfullscreen', handleIOSBegin);
+      video.addEventListener('webkitendfullscreen', handleIOSEnd);
+    }
+
     return () => {
       document.removeEventListener('fullscreenchange', handleFullScreenChange);
       document.removeEventListener('webkitfullscreenchange', handleFullScreenChange);
+      if (video) {
+        video.removeEventListener('webkitbeginfullscreen', handleIOSBegin);
+        video.removeEventListener('webkitendfullscreen', handleIOSEnd);
+      }
     };
   }, []);
 
@@ -108,11 +135,13 @@ const VideoPlayer = ({ channelName, channelCount, videoUrl, isMobileSticky = fal
         console.warn('[VideoPlayer] Seeking to live edge failed:', seekError);
       }
 
-      video.play().then(() => {
-      }).catch(err => {
-        console.warn('[VideoPlayer] video.play() failed:', err);
-        setIsPlaying(false);
-      });
+      video
+        .play()
+        .then(() => {})
+        .catch(err => {
+          console.warn('[VideoPlayer] video.play() failed:', err);
+          setIsPlaying(false);
+        });
     } else {
       video.pause();
     }
@@ -171,7 +200,11 @@ const VideoPlayer = ({ channelName, channelCount, videoUrl, isMobileSticky = fal
     isPlayingRef.current = true;
 
     let hls;
-    const isHls = videoUrl && (videoUrl.endsWith('.m3u8') || videoUrl.includes('.m3u8') || videoUrl.includes('m3u8'));
+    const isHls =
+      videoUrl &&
+      (videoUrl.endsWith('.m3u8') ||
+        videoUrl.includes('.m3u8') ||
+        videoUrl.includes('m3u8'));
 
     setIsWaiting(true);
 
@@ -214,7 +247,9 @@ const VideoPlayer = ({ channelName, channelCount, videoUrl, isMobileSticky = fal
 
             if (hls.levels && hls.levels.length > 0) {
               const options = hls.levels.map((level, index) => {
-                const label = level.height ? `${level.height}p` : `Level ${index + 1}`;
+                const label = level.height
+                  ? `${level.height}p`
+                  : `Level ${index + 1}`;
                 return { index, label };
               });
               setQualityOptions([{ index: -1, label: 'Auto' }, ...options]);
@@ -263,7 +298,7 @@ const VideoPlayer = ({ channelName, channelCount, videoUrl, isMobileSticky = fal
     };
   }, [videoUrl]);
 
-  const changeQuality = (option) => {
+  const changeQuality = option => {
     setQuality(option.label);
     if (hlsRef.current) {
       hlsRef.current.currentLevel = option.index;
@@ -289,27 +324,62 @@ const VideoPlayer = ({ channelName, channelCount, videoUrl, isMobileSticky = fal
     const container = containerRef.current;
     const video = videoRef.current;
 
-    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-      if (container.requestFullscreen) {
-        container.requestFullscreen().catch(err => {
+    // Check if currently in any fullscreen mode
+    const isCurrentlyFS = !!(document.fullscreenElement || document.webkitFullscreenElement || isIOSFullscreen);
+
+    if (!isCurrentlyFS) {
+      // --- ENTER FULLSCREEN ---
+      const enterFS = () => {
+        // Try standard Fullscreen API on container first
+        if (container.requestFullscreen) {
+          return container.requestFullscreen();
+        } else if (container.webkitRequestFullscreen) {
+          container.webkitRequestFullscreen();
+          return Promise.resolve();
+        } else if (video.webkitEnterFullscreen) {
+          // iOS Safari fallback: fullscreen on video element
+          video.webkitEnterFullscreen();
+          return Promise.resolve();
+        }
+        return Promise.reject(new Error('Fullscreen API not supported'));
+      };
+
+      enterFS()
+        .then(() => {
+          // Lock landscape orientation on mobile for best viewing
+          if (screen?.orientation?.lock) {
+            screen.orientation.lock('landscape').catch(() => {
+              // Orientation lock not supported or not allowed, that's fine
+            });
+          }
+        })
+        .catch(err => {
           console.error('Fullscreen error:', err);
         });
-      } else if (container.webkitRequestFullscreen) {
-        container.webkitRequestFullscreen();
-      } else if (video.webkitEnterFullscreen) {
-        video.webkitEnterFullscreen();
-      }
     } else {
+      // --- EXIT FULLSCREEN ---
       if (document.exitFullscreen) {
         document.exitFullscreen();
       } else if (document.webkitExitFullscreen) {
         document.webkitExitFullscreen();
+      } else if (video.webkitExitFullscreen) {
+        video.webkitExitFullscreen();
+      }
+      // Unlock orientation on exit
+      if (screen?.orientation?.unlock) {
+        try { screen.orientation.unlock(); } catch (_) {}
       }
     }
   };
 
+  // Double-tap / double-click to toggle fullscreen (YouTube-like)
+  const handleDoubleToggle = e => {
+    if (e) e.stopPropagation();
+    toggleFullScreen(e);
+  };
+
   return (
-    <div 
+    <div
       className="flex flex-col w-full scrollbar-none"
       onMouseMove={handleUserActivity}
     >
@@ -340,15 +410,17 @@ const VideoPlayer = ({ channelName, channelCount, videoUrl, isMobileSticky = fal
       </AnimatePresence>
       <div
         ref={containerRef}
+        data-fullscreen={isFullScreen ? "true" : undefined}
         className={`group relative bg-black shadow-2xl scrollbar-none transition-all duration-300 ${
-          isFullScreen 
-            ? 'w-screen h-screen rounded-none ring-0' 
+          isFullScreen
+            ? 'fixed inset-0 w-screen h-screen rounded-none ring-0 z-[9999]'
             : `aspect-video w-full ring-1 ring-white/10 lg:rounded-2xl ${
                 isMobileSticky ? 'rounded-xl shadow-xl' : 'rounded-none'
               }`
         }`}
         onMouseMove={handleUserActivity}
         onClick={handleUserActivity}
+        onDoubleClick={handleDoubleToggle}
       >
         <div className="absolute inset-0 flex items-center justify-center">
           <video
@@ -363,7 +435,9 @@ const VideoPlayer = ({ channelName, channelCount, videoUrl, isMobileSticky = fal
         {isWaiting && isPlaying && (
           <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/40 backdrop-blur-[2px] pointer-events-none">
             <span className="h-12 w-12 animate-spin rounded-full border-4 border-[#E61944] border-t-transparent" />
-            <span className="mt-3 text-xs font-semibold text-white/80 tracking-wider">Buffering...</span>
+            <span className="mt-3 text-xs font-semibold text-white/80 tracking-wider">
+              Buffering...
+            </span>
           </div>
         )}
 
@@ -378,7 +452,7 @@ const VideoPlayer = ({ channelName, channelCount, videoUrl, isMobileSticky = fal
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.8, opacity: 0 }}
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation();
                   togglePlay(e);
                 }}
@@ -416,7 +490,11 @@ const VideoPlayer = ({ channelName, channelCount, videoUrl, isMobileSticky = fal
                       onClick={togglePlay}
                       className="text-white hover:text-[#E61944] hover:scale-105 transition-all cursor-pointer"
                     >
-                      {isPlaying ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" />}
+                      {isPlaying ? (
+                        <Pause size={20} fill="currentColor" />
+                      ) : (
+                        <Play size={20} fill="currentColor" />
+                      )}
                     </button>
 
                     <div className="flex items-center gap-2 group/volume">
@@ -424,7 +502,11 @@ const VideoPlayer = ({ channelName, channelCount, videoUrl, isMobileSticky = fal
                         onClick={toggleMute}
                         className="text-white hover:text-[#E61944] hover:scale-105 transition-all cursor-pointer"
                       >
-                        {isMuted || volume === 0 ? <VolumeX size={20} /> : <Volume2 size={20} />}
+                        {isMuted || volume === 0 ? (
+                          <VolumeX size={20} />
+                        ) : (
+                          <Volume2 size={20} />
+                        )}
                       </button>
                       <input
                         type="range"
@@ -478,8 +560,9 @@ const VideoPlayer = ({ channelName, channelCount, videoUrl, isMobileSticky = fal
                     <button
                       onClick={toggleFullScreen}
                       className="text-white hover:text-[#E61944] hover:scale-105 transition-all cursor-pointer bg-white/10 hover:bg-white/20 p-1.5 rounded-lg border border-white/5"
+                      title={isFullScreen ? 'Exit fullscreen' : 'Fullscreen'}
                     >
-                      <Maximize size={18} />
+                      {isFullScreen ? <Minimize size={18} /> : <Maximize size={18} />}
                     </button>
                   </div>
                 </div>
