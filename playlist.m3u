@@ -3,9 +3,14 @@
 #EXTINF:-1 tvg-id="FIFA 1" tvg-logo="https://i.ibb.co.com/vnbkF0r/fifa-world-cup-2026-logo-png-seeklogo-665644.png" group-title="Sports",FIFA CH 1
 https://cdn.yallashooot.pp.ua/hls/ch1.m3u8
 
-
 #EXTINF:-1 tvg-id="FIFA 2" tvg-logo="https://i.ibb.co.com/vnbkF0r/fifa-world-cup-2026-logo-png-seeklogo-665644.png" group-title="Sports",FIFA CH 2
 https://s3.us-east-1.amazonaws.com/yalapro1/hls/0/stream.m3u8
+
+#EXTINF:-1 tvg-id="FIFA 3" tvg-logo="https://i.ibb.co.com/vnbkF0r/fifa-world-cup-2026-logo-png-seeklogo-665644.png" group-title="Sports",FIFA CH 3
+https://pruiaaaaaaa.yallaliveshoot.info/hls/ch1/master.m3u8
+
+#EXTINF:-1 tvg-id="FIFA 4" tvg-logo="https://i.ibb.co.com/vnbkF0r/fifa-world-cup-2026-logo-png-seeklogo-665644.png" group-title="Sports",FIFA CH 4
+https://2.78542.qzz.io/hls/1/stream.m3u8
 
 #EXTINF:-1 tvg-id="FIFAPlus.uk@UnitedStates" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/FIFA%2B_(2025).svg/960px-FIFA%2B_(2025).svg.png" group-title="Sports",FIFA+ (720p), CH 1
 https://d2w9q46ikgrcwx.cloudfront.net/v1/sysdata_s_p_a_fifa_7/samsungheadend_us/latest/main/hls/playlist.m3u8
