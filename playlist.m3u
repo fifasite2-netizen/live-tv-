@@ -1,28 +1,16 @@
 #EXTM3U
 
-#EXTINF:-1 tvg-id="FIFA" tvg-logo="https://i.ibb.co.com/wNjJ6trt/1781362521446-removebg-preview.png" group-title="Sports",FIFA World Cup, CH 1
-https://1nyaler.streamhostingcdn.top/stream/33/index.m3u8 
+#EXTINF:-1 tvg-id="Win Sports" tvg-logo="https://i.ibb.co.com/wNjJ6trt/1781362521446-removebg-preview.png" group-title="Sports",FIFA World Cup, CH 1
+https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8
 
-#EXTINF:-1 tvg-id="FIFA" tvg-logo="https://i.ibb.co.com/wNjJ6trt/1781362521446-removebg-preview.png" group-title="Sports",FIFA World Cup, CH 2
+#EXTINF:-1 tvg-id="DAZN Directo" tvg-logo="https://i.ibb.co.com/wNjJ6trt/1781362521446-removebg-preview.png" group-title="Sports",FIFA World Cup, CH 2
 https://1nyaler.streamhostingcdn.top/stream/94/index.m3u8 
 
-#EXTINF:-1 tvg-id="FIFA" tvg-logo="https://i.ibb.co.com/wNjJ6trt/1781362521446-removebg-preview.png" group-title="Sports",FIFA World Cup, CH 3
-https://1nyaler.streamhostingcdn.top/stream/3/index.m3u8
+#EXTINF:-1 tvg-id="Bein sports Max Arabic" tvg-logo="https://i.ibb.co.com/wNjJ6trt/1781362521446-removebg-preview.png" group-title="Sports",FIFA World Cup, CH 3
+https://prod-fastly-eu-west-3.video.pscp.tv/Transcoding/v1/hls/Ls7EUAx9EAtrXBulf1yUPWtiyYzOzA-rAelY2RnwcdCfDTMHFW6MXLOekjZQix8c42BeeFGoEut44NIU_1_GbA/non_transcode/eu-west-3/periscope-replay-direct-prod-eu-west-3-public/master_dynamic_highlatency.m3u8?type=live
 
-#EXTINF:-1 tvg-id="FIFA" tvg-logo="https://i.ibb.co.com/wNjJ6trt/1781362521446-removebg-preview.png" group-title="Sports",FIFA World Cup, CH 4
-https://1nyaler.streamhostingcdn.top/stream/84/index.m3u8
-
-#EXTINF:-1 tvg-id="FIFA" tvg-logo="https://i.ibb.co.com/wNjJ6trt/1781362521446-removebg-preview.png" group-title="Sports",FIFA World Cup, CH 5
-https://1nyaler.streamhostingcdn.top/stream/30/index.m3u8
-
-#EXTINF:-1 tvg-id="FIFA" tvg-logo="https://i.ibb.co.com/wNjJ6trt/1781362521446-removebg-preview.png" group-title="Sports",FIFA World Cup, CH 6
-https://amg01334-beinsportsllc-beinxtraesp-localnow-aekzc.amagi.tv/playlist.m3u8
-
-#EXTINF:-1 tvg-id="FIFA" tvg-logo="https://i.ibb.co.com/wNjJ6trt/1781362521446-removebg-preview.png" group-title="Sports",FIFA World Cup, CH 7
-https://1nyaler.streamhostingcdn.top/stream/80/index.m3u8 
-
-#EXTINF:-1 tvg-id="FIFA" tvg-logo="https://i.ibb.co.com/wNjJ6trt/1781362521446-removebg-preview.png" group-title="Sports",FIFA World Cup, CH 8
-https://1nyaler.streamhostingcdn.top/stream/5/index.m3u8
+#EXTINF:-1 tvg-id="Bein Sports 1" tvg-logo="https://i.ibb.co.com/wNjJ6trt/1781362521446-removebg-preview.png" group-title="Sports",FIFA World Cup, CH 4
+https://1nyaler.streamhostingcdn.top/stream/23/index.m3u8
 
 
 
