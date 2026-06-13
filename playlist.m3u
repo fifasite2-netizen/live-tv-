@@ -6,14 +6,11 @@ https://1nyaler.streamhostingcdn.top/stream/32/index.m3u8
 #EXTINF:-1 tvg-id="DAZN Directo" tvg-logo="https://i.ibb.co.com/wNjJ6trt/1781362521446-removebg-preview.png" group-title="Sports",FIFA World Cup, CH 2
 https://1nyaler.streamhostingcdn.top/stream/94/index.m3u8 
 
-#EXTINF:-1 tvg-id="Bein sports 1 Max" tvg-logo="https://i.ibb.co.com/wNjJ6trt/1781362521446-removebg-preview.png" group-title="Sports",FIFA World Cup, CH 3
-https://prod-fastly-eu-west-3.video.pscp.tv/Transcoding/v1/hls/Ls7EUAx9EAtrXBulf1yUPWtiyYzOzA-rAelY2RnwcdCfDTMHFW6MXLOekjZQix8c42BeeFGoEut44NIU_1_GbA/non_transcode/eu-west-3/periscope-replay-direct-prod-eu-west-3-public/master_dynamic_highlatency.m3u8?type=live
-
-#EXTINF:-1 tvg-id="Bein Sports 3" tvg-logo="https://i.ibb.co.com/wNjJ6trt/1781362521446-removebg-preview.png" group-title="Sports",FIFA World Cup, CH 3
-https://prod-fastly-eu-west-3.video.pscp.tv/Transcoding/v1/hls/NLvMMRwQpiDixZiFRTh0VEVjGxj8LKn0RPAY6N_rRIu0nUigzwpxzZTVnT1AwQX5vQzF3CiES7UbFHzn_1-oyw/non_transcode/eu-west-3/periscope-replay-direct-prod-eu-west-3-public/master_dynamic_highlatency.m3u8?type=live
-
-#EXTINF:-1 tvg-id="Bein Sports 1" tvg-logo="https://i.ibb.co.com/wNjJ6trt/1781362521446-removebg-preview.png" group-title="Sports",FIFA World Cup, CH 4
+#EXTINF:-1 tvg-id="Bein Sports 1" tvg-logo="https://i.ibb.co.com/wNjJ6trt/1781362521446-removebg-preview.png" group-title="Sports",FIFA World Cup, CH 3
 https://1nyaler.streamhostingcdn.top/stream/23/index.m3u8
+
+#EXTINF:-1 tvg-id="Bein sports 1 Max" tvg-logo="https://i.ibb.co.com/wNjJ6trt/1781362521446-removebg-preview.png" group-title="Sports",FIFA World Cup, CH 4
+https://prod-fastly-eu-west-3.video.pscp.tv/Transcoding/v1/hls/Ls7EUAx9EAtrXBulf1yUPWtiyYzOzA-rAelY2RnwcdCfDTMHFW6MXLOekjZQix8c42BeeFGoEut44NIU_1_GbA/non_transcode/eu-west-3/periscope-replay-direct-prod-eu-west-3-public/master_dynamic_highlatency.m3u8?type=live
 
 
 
