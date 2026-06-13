@@ -1,10 +1,40 @@
 #EXTM3U
 
-#EXTINF:-1 tvg-id="FIFA 1" tvg-logo="https://i.ibb.co.com/vnbkF0r/fifa-world-cup-2026-logo-png-seeklogo-665644.png" group-title="Sports",FIFA CH 1
-https://s3.us-east-1.amazonaws.com/yalapro1/hls/0/stream.m3u8
+#EXTINF:-1 tvg-id="FIFA" tvg-logo="https://i.ibb.co.com/zWPpMGhW/IMG-20260613-200607.png" group-title="Sports",FIFA, CH 1
+https://1nyaler.streamhostingcdn.top/stream/33/index.m3u8 
 
-#EXTINF:-1 tvg-id="FIFA 2" tvg-logo="https://i.ibb.co.com/vnbkF0r/fifa-world-cup-2026-logo-png-seeklogo-665644.png" group-title="Sports",FIFA CH 2
-https://pruiaaaaaaa.yallaliveshoot.info/hls/ch1/master.m3u8
+#EXTINF:-1 tvg-id="FIFA" tvg-logo="https://i.ibb.co.com/zWPpMGhW/IMG-20260613-200607.png" group-title="Sports",FIFA, CH 2
+https://1nyaler.streamhostingcdn.top/stream/94/index.m3u8 
+
+#EXTINF:-1 tvg-id="FIFA" tvg-logo="https://i.ibb.co.com/zWPpMGhW/IMG-20260613-200607.png" group-title="Sports",FIFA, CH 3
+https://1nyaler.streamhostingcdn.top/stream/3/index.m3u8
+
+#EXTINF:-1 tvg-id="FIFA" tvg-logo="https://i.ibb.co.com/zWPpMGhW/IMG-20260613-200607.png" group-title="Sports",FIFA, CH 4
+https://1nyaler.streamhostingcdn.top/stream/84/index.m3u8
+
+#EXTINF:-1 tvg-id="FIFA" tvg-logo="https://i.ibb.co.com/zWPpMGhW/IMG-20260613-200607.png" group-title="Sports",FIFA, CH 5
+https://1nyaler.streamhostingcdn.top/stream/30/index.m3u8
+
+#EXTINF:-1 tvg-id="FIFA" tvg-logo="https://i.ibb.co.com/zWPpMGhW/IMG-20260613-200607.png" group-title="Sports",FIFA, CH 6
+https://amg01334-beinsportsllc-beinxtraesp-localnow-aekzc.amagi.tv/playlist.m3u8
+
+#EXTINF:-1 tvg-id="FIFA" tvg-logo="https://i.ibb.co.com/zWPpMGhW/IMG-20260613-200607.png" group-title="Sports",FIFA, CH 7
+https://1nyaler.streamhostingcdn.top/stream/80/index.m3u8 
+
+#EXTINF:-1 tvg-id="FIFA" tvg-logo="https://i.ibb.co.com/zWPpMGhW/IMG-20260613-200607.png" group-title="Sports",FIFA, CH 8
+https://1nyaler.streamhostingcdn.top/stream/5/index.m3u8
+
+
+
+
+
+
+#EXTINF:-1 tvg-id="BTV" tvg-logo="https://tstatic.akash-go.com/cms-ui/images/custom-content/1735561595482.png" group-title="Sports",BTV, CH 1
+https://owrcovcrpy.gpcdn.net/bpk-tv/1709/output/index.m3u8
+
+
+
+
 
 
 
