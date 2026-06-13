@@ -53,7 +53,8 @@ export function parseM3U(text) {
       
       const tvgId = idMatch ? idMatch[1] : '';
       const cleanNameKey = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-      const uniqueId = tvgId ? `${tvgId}-${cleanNameKey}` : cleanNameKey;
+      const cleanCountKey = channelCount ? `-${channelCount.toLowerCase().replace(/[^a-z0-9]+/g, '-')}` : '';
+      const uniqueId = tvgId ? `${tvgId}-${cleanNameKey}${cleanCountKey}` : `${cleanNameKey}${cleanCountKey}`;
       const group = groupMatch ? groupMatch[1] : 'General';
       const stats = getStableStats(name);
 
