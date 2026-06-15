@@ -443,8 +443,7 @@ const VideoPlayer = ({
 
         {/* Center Play/Pause Button Overlay */}
         <div
-          className="absolute inset-0 z-10 flex items-center justify-center cursor-pointer"
-          onClick={togglePlay}
+          className="absolute inset-0 z-10 flex items-center justify-center"
         >
           <AnimatePresence>
             {!isWaiting && (!isPlaying || showControls) && (
@@ -456,7 +455,7 @@ const VideoPlayer = ({
                   e.stopPropagation();
                   togglePlay(e);
                 }}
-                className="z-20 flex h-20 w-20 items-center justify-center rounded-full bg-black/5 backdrop-blur-[1px] border border-white/10 text-white hover:bg-black/20 hover:scale-105 transition-all shadow-2xl"
+                className="z-20 flex h-20 w-20 items-center justify-center rounded-full bg-black/5 backdrop-blur-[1px] border border-white/10 text-white hover:bg-black/20 hover:scale-105 transition-all shadow-2xl cursor-pointer"
               >
                 {isPlaying ? (
                   <Pause size={36} fill="currentColor" />
