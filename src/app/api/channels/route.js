@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { parseM3U } from '@/components/lib/m3uParser';
+import { parseM3U } from '@/lib/m3uParser';
 
 export async function GET() {
   try {

@@ -3,50 +3,56 @@
 import { Calendar, Clock, Trophy } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 
-const MatchSchedule = () => {
-  const [schedule, setSchedule] = useState([]);
-  const [loading, setLoading] = useState(true);
+const MatchSchedule = ({ schedule: propSchedule, loading: propLoading }) => {
+  const [localSchedule, setLocalSchedule] = useState([]);
+  const [localLoading, setLocalLoading] = useState(propSchedule === undefined);
+
+  const isControlled = propSchedule !== undefined;
+  const schedule = isControlled ? propSchedule : localSchedule;
+  const loading = isControlled ? propLoading : localLoading;
+
   const [selectedDate, setSelectedDate] = useState('');
   const datesContainerRef = useRef(null);
 
+  // Fetch only in uncontrolled mode
   useEffect(() => {
+    if (isControlled) return;
+
     fetch('/api/schedule')
       .then(res => res.json())
       .then(data => {
         if (!data.error) {
-          setSchedule(data);
-          
-          // Determine the default selected date:
-          // Find the first match that is live (state === 'in') or in the future
-          const now = new Date();
-          const activeMatch = data.find(match => {
-            return match.state === 'in' || new Date(match.rawDate) >= now;
-          });
-          
-          if (activeMatch) {
-            setSelectedDate(activeMatch.date);
-          } else if (data.length > 0) {
-            // Fallback to the first match's date
-            setSelectedDate(data[0].date);
-          }
+          setLocalSchedule(data);
         }
-        setLoading(false);
+        setLocalLoading(false);
       })
       .catch(err => {
         console.error('Fetch error:', err);
-        setLoading(false);
+        setLocalLoading(false);
       });
-  }, []);
+  }, [isControlled]);
 
   // Extract unique dates from the schedule
   const uniqueDates = Array.from(new Set(schedule.map(match => match.date)));
 
+  // Calculate default selected date based on schedule content (live first, then next future match)
+  const defaultDate = (() => {
+    if (!schedule || schedule.length === 0) return '';
+    const now = new Date();
+    const activeMatch = schedule.find(match => {
+      return match.state === 'in' || new Date(match.rawDate) >= now;
+    });
+    return activeMatch ? activeMatch.date : schedule[0].date;
+  })();
+
+  const activeDate = selectedDate || defaultDate;
+
   // Filter matches for the selected date
-  const filteredMatches = schedule.filter(match => match.date === selectedDate);
+  const filteredMatches = schedule.filter(match => match.date === activeDate);
 
   // Auto-scroll selected date into view within the horizontal container
   useEffect(() => {
-    if (selectedDate && datesContainerRef.current) {
+    if (activeDate && datesContainerRef.current) {
       const activeTab = datesContainerRef.current.querySelector('[data-active="true"]');
       if (activeTab) {
         activeTab.scrollIntoView({
@@ -56,7 +62,7 @@ const MatchSchedule = () => {
         });
       }
     }
-  }, [selectedDate]);
+  }, [activeDate]);
 
   return (
     <div className="space-y-4 rounded-2xl border border-zinc-800/60 bg-zinc-900/40 backdrop-blur-xl p-5 shadow-sm">
@@ -85,7 +91,7 @@ const MatchSchedule = () => {
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {uniqueDates.map(dateStr => {
-            const isActive = dateStr === selectedDate;
+            const isActive = dateStr === activeDate;
             const [monthDay, weekday] = dateStr.split(', ');
             const shortWeekday = weekday ? weekday.substring(0, 3).toUpperCase() : '';
             
@@ -134,7 +140,7 @@ const MatchSchedule = () => {
                     : 'border-zinc-800/60 bg-zinc-900/20 hover:border-zinc-700'
                 }`}
               >
-                {/* Meta details (group name + status indicator) */}
+                {/* Meta details */}
                 <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-zinc-500">
                   <span>{match.group}</span>
                   {isLive ? (
