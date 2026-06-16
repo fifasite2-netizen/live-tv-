@@ -9,13 +9,15 @@ import MatchSchedule from '@/components/MatchSchedule';
 import HighlightsList from '@/components/HighlightsList';
 import StreamHeader from '@/components/StreamHeader';
 import MatchStats from '@/components/MatchStats';
-import PremiumPromo from '@/components/PremiumPromo';
 
 export default function HomeClient() {
   const [channels, setChannels] = useState([]);
   const [activeChannel, setActiveChannel] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('channels');
+
+  const [schedule, setSchedule] = useState([]);
+  const [isScheduleLoading, setIsScheduleLoading] = useState(true);
 
   const [isSticky, setIsSticky] = useState(false);
   const [videoHeight, setVideoHeight] = useState(0);
@@ -73,6 +75,17 @@ export default function HomeClient() {
         setIsLoading(false);
       })
       .catch(() => setIsLoading(false));
+  }, []);
+
+  // Fetch schedule data
+  useEffect(() => {
+    fetch('/api/schedule')
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.error) setSchedule(data);
+        setIsScheduleLoading(false);
+      })
+      .catch(() => setIsScheduleLoading(false));
   }, []);
 
   return (
@@ -156,7 +169,7 @@ export default function HomeClient() {
           <div className="px-6 lg:px-0">
             {/* Match Stats & Highlights */}
             <div className={`space-y-6 lg:space-y-8 ${activeTab === 'stats' ? 'block' : 'hidden lg:block'}`}>
-              <MatchStats />
+              <MatchStats schedule={schedule} loading={isScheduleLoading} />
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -177,7 +190,7 @@ export default function HomeClient() {
                 ) : (
                   <ChannelList channels={channels} activeChannelId={activeChannel ? activeChannel.id : ''} onChannelSelect={setActiveChannel} />
                 ))}
-              {activeTab === 'schedule' && <MatchSchedule />}
+              {activeTab === 'schedule' && <MatchSchedule schedule={schedule} loading={isScheduleLoading} />}
             </div>
           </div>
         </div>
@@ -197,8 +210,7 @@ export default function HomeClient() {
           ) : (
             <ChannelList channels={channels} activeChannelId={activeChannel ? activeChannel.id : ''} onChannelSelect={setActiveChannel} />
           )}
-          <MatchSchedule />
-          <PremiumPromo />
+          <MatchSchedule schedule={schedule} loading={isScheduleLoading} />
         </motion.div>
       </div>
     </div>
