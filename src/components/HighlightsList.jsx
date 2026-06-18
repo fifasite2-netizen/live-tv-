@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Film, Eye, Calendar, Trophy, X, Play, Pause, Maximize2, Minimize2 } from 'lucide-react';
-import highlights from '@/data/highlights.json';
 import Link from 'next/link';
+import { getHighlights } from '@/lib/api/highlights';
 
 /* ── Load YouTube IFrame API once ── */
 let apiReady = false;
@@ -328,6 +328,41 @@ const HighlightCard = ({ video }) => {
 
 /* ── Main highlights grid ── */
 const HighlightsList = ({ showAll = false }) => {
+  const [highlights, setHighlights] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getHighlights()
+      .then(data => {
+        if (Array.isArray(data)) {
+          setHighlights(data);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to fetch highlights:', err);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between px-2">
+          <h2 className="text-lg font-bold tracking-tight flex items-center gap-2">
+            <Film size={20} className="text-[#E61944]" />
+            Match Highlights
+          </h2>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3].map(i => (
+            <div key={i} className="aspect-video w-full rounded-xl bg-zinc-900 border border-zinc-800/60 animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   const videos = showAll ? highlights : highlights.slice(0, 3);
 
   return (
@@ -348,11 +383,18 @@ const HighlightsList = ({ showAll = false }) => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {videos.map(video => (
-          <HighlightCard key={video.id} video={video} />
-        ))}
-      </div>
+      {videos.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-12 text-zinc-500 border border-dashed border-zinc-800 rounded-xl">
+          <Film size={28} className="opacity-40 mb-2" />
+          <span className="text-xs font-medium">No highlights available</span>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {videos.map(video => (
+            <HighlightCard key={video.id} video={video} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
