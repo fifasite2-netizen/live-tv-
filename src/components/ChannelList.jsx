@@ -20,7 +20,7 @@ const ChannelList = ({ channels, activeChannelId, onChannelSelect }) => {
       {/* Grid Container */}
       <div className="grid grid-cols-1 gap-3 lg:max-h-[480px] lg:overflow-y-auto lg:pr-1.5 custom-scrollbar">
         {channels.map(channel => {
-          const isActive = activeChannelId === channel.id;
+          const isActive = !!(activeChannelId && channel.id && activeChannelId === channel.id);
           return (
             <motion.button
               key={channel.id}

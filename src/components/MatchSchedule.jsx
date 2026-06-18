@@ -2,6 +2,7 @@
 
 import { Calendar, Clock, Trophy } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
+import { getSchedule } from '@/lib/api/schedule';
 
 const MatchSchedule = ({ schedule: propSchedule, loading: propLoading }) => {
   const [localSchedule, setLocalSchedule] = useState([]);
@@ -18,8 +19,7 @@ const MatchSchedule = ({ schedule: propSchedule, loading: propLoading }) => {
   useEffect(() => {
     if (isControlled) return;
 
-    fetch('/api/schedule')
-      .then(res => res.json())
+    getSchedule()
       .then(data => {
         if (!data.error) {
           setLocalSchedule(data);
