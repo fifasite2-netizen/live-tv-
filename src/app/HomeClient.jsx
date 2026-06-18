@@ -9,6 +9,8 @@ import MatchSchedule from '@/components/MatchSchedule';
 import HighlightsList from '@/components/HighlightsList';
 import StreamHeader from '@/components/StreamHeader';
 import MatchStats from '@/components/MatchStats';
+import { getChannels } from '@/lib/api/channels';
+import { getSchedule } from '@/lib/api/schedule';
 
 export default function HomeClient() {
   const [channels, setChannels] = useState([]);
@@ -64,11 +66,7 @@ export default function HomeClient() {
 
   // Fetch channels data
   useEffect(() => {
-    fetch('/api/channels')
-      .then((res) => {
-        if (!res.ok) throw new Error('Playlist fetch failed');
-        return res.json();
-      })
+    getChannels()
       .then((data) => {
         setChannels(data);
         if (data.length > 0) setActiveChannel(data[0]);
@@ -79,8 +77,7 @@ export default function HomeClient() {
 
   // Fetch schedule data
   useEffect(() => {
-    fetch('/api/schedule')
-      .then((res) => res.json())
+    getSchedule()
       .then((data) => {
         if (!data.error) setSchedule(data);
         setIsScheduleLoading(false);
