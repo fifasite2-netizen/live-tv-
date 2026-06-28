@@ -1,7 +1,7 @@
 // src/app/page.js - Server Component
 export const metadata = {
-  title: 'Home - Ajker Khela',
-  description: 'Watch live FIFA World Cup streams and highlights.'
+  title: 'Ajker Khela - Live Sports Streaming & Highlights',
+  description: 'Watch live sports streams, football match highlights, and upcoming match schedules.',
 };
 
 import HomeClient from './HomeClient';

@@ -2,7 +2,7 @@ import MatchSchedule from '@/components/MatchSchedule';
 
 export const metadata = {
   title: 'Schedule - Ajker Khela',
-  description: 'View upcoming match schedule and live streaming times.'
+  description: 'View upcoming match schedule and live streaming times.',
 };
 
 export default function SchedulePage() {
