@@ -30,7 +30,7 @@ export default function NotFound() {
             className="inline-flex items-center gap-2 rounded-xl bg-[#E61944] px-6 py-3.5 text-xs font-bold text-white hover:bg-red-700 shadow-lg shadow-[#E61944]/15 hover:shadow-[#E61944]/25 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer transition-all duration-300"
           >
             <Home size={15} />
-            Back to Home
+            Back To Home
           </Link>
         </div>
       </div>
