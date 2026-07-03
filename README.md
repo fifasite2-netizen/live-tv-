@@ -130,4 +130,5 @@ npm run lint
 
 ---
 
-Developed with ⚽ by [Mahmudul Hasan](https://linkedin.com/in/mahmudulhasanzb).
+Developed with ⚽ by  
+
